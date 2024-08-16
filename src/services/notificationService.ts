@@ -1,9 +1,9 @@
 import { Logger } from "../logger";
-import {
-  AbstractNotification,
-} from "../models/abstractNotification";
+import { AbstractNotification } from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
+import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
+import { UserNotificationMetadataService } from "./userNotificationMetadataService";
 
 const notificationFactoryMap: {
   [key: string]: (raw: Object) => AbstractNotification;
@@ -19,10 +19,17 @@ export type EnabledNotificationType = ReturnType<
 >;
 
 export class NotificationService {
+  private userNotificationMetadataService: UserNotificationMetadataService;
   constructor(
     private viewerUserId: string,
-    private notificationRepository: INotificationRepository
-  ) {}
+    private notificationRepository: INotificationRepository,
+    userNotificationMetadataRepository: IUserNotificationMetadataRepository
+  ) {
+    this.userNotificationMetadataService = new UserNotificationMetadataService(
+      viewerUserId,
+      userNotificationMetadataRepository
+    );
+  }
 
   factory = (rawNotification: Object): EnabledNotificationType | null => {
     const notificationType = rawNotification["type"] as string;
@@ -93,22 +100,6 @@ export class NotificationService {
     await this.notificationRepository.genMarkAsReadX(uuid);
   };
 
-  genIfUserHasNewNotification = async (): Promise<boolean> => {
-    const userMetadata =
-      await this.notificationRepository.genFetchUserMetadataX(
-        this.viewerUserId
-      );
-    const latestNotifCreateTime = userMetadata?.latestNotifCreateTime ?? 0;
-    const lastFetchTime = userMetadata?.lastFetchTime ?? 0;
-    return latestNotifCreateTime > lastFetchTime;
-  };
-
-  updateWatermarkForUser = async (): Promise<void> => {
-    await this.notificationRepository.genUpdateWatermarkForUserX(
-      this.viewerUserId
-    );
-  };
-
   genSave = async (notification: AbstractNotification): Promise<boolean> => {
     try {
       await this.notificationRepository.genCreateX(notification);
@@ -117,9 +108,7 @@ export class NotificationService {
       return false;
     }
     try {
-      await this.notificationRepository.genUpdateWatermarkForUserX(
-        this.viewerUserId
-      );
+      await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
     } catch (error) {
       Logger.error(`Error updating watermark for user: ${error.message}`);
     } finally {
