@@ -3,7 +3,7 @@ import { AbstractNotification } from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
-import { UserNotificationMetadataService } from "./userNotificationMetadataService";
+import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
 const notificationFactoryMap: {
   [key: string]: (raw: Object) => AbstractNotification;
@@ -23,7 +23,7 @@ export class NotificationService {
   constructor(
     private viewerUserId: string,
     private notificationRepository: INotificationRepository,
-    userNotificationMetadataRepository: IUserNotificationMetadataRepository
+    private userNotificationMetadataRepository: IUserNotificationMetadataRepository
   ) {
     this.userNotificationMetadataService = new UserNotificationMetadataService(
       viewerUserId,
@@ -90,7 +90,9 @@ export class NotificationService {
   genMarkAsReadX = async (uuid: string): Promise<void> => {
     const notifPerm = await NotificationPerm.fromNotificationUuid(
       this.viewerUserId,
-      uuid
+      uuid,
+      this.notificationRepository,
+      this.userNotificationMetadataRepository
     );
     if (!notifPerm.viewerIsOwner) {
       throw new Error(
@@ -121,7 +123,9 @@ export class NotificationService {
   ): Promise<AbstractNotification | null> => {
     const perm = await NotificationPerm.fromNotificationUuid(
       this.viewerUserId,
-      notificationUid
+      notificationUid,
+      this.notificationRepository,
+      this.userNotificationMetadataRepository
     );
     if (!perm.canView) {
       throw new Error(
