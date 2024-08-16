@@ -2,6 +2,7 @@ import {
   IUserNotificationMetadata,
   IUserNotificationMetadataRepository,
 } from "./IUserNotificationMetadataRepository";
+import { MongoNotificationUserMetadataCollection } from "./mongoCollections";
 
 export class MongoUserNotificationMetadataRepository
   implements IUserNotificationMetadataRepository
@@ -9,7 +10,7 @@ export class MongoUserNotificationMetadataRepository
   genFetchLatestCreationTimeForUserX = async (
     userId: string
   ): Promise<number> => {
-    const userMetadata = await MongoUserMetadataCollection.findOne({
+    const userMetadata = await MongoNotificationUserMetadataCollection.findOne({
       userId: userId,
     });
     return userMetadata?.latestNotifCreateTime ?? 0;
@@ -17,7 +18,7 @@ export class MongoUserNotificationMetadataRepository
 
   genUpdateWatermarkForUserX = async (userId: string): Promise<void> => {
     const lastFetchTime = Date.now();
-    await MongoUserMetadataCollection.updateOne(
+    await MongoNotificationUserMetadataCollection.updateOne(
       { userId: userId },
       { $set: { lastFetchTime: lastFetchTime } },
       { upsert: true }
@@ -27,7 +28,7 @@ export class MongoUserNotificationMetadataRepository
   genFetchUserMetadataX = async (
     userId: string
   ): Promise<IUserNotificationMetadata> => {
-    const userMetadata = await MongoUserMetadataCollection.findOne({
+    const userMetadata = await MongoNotificationUserMetadataCollection.findOne({
       userId: userId,
     });
     return {

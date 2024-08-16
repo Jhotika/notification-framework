@@ -1,15 +1,19 @@
+import { AbstractNotification } from "models/abstractNotification";
 import { INotificationRepository } from "./INotificationRepository";
 import { MongoNotificationCollection } from "./mongoCollections";
+import { IPrivacyUnsafe } from "./IUserNotificationMetadataRepository";
 
-export class MongoNotificationRepository implements INotificationRepository {
-  genCreateX = async (notification: Object): Promise<void> => {
+export class MongoNotificationRepository
+  implements INotificationRepository, IPrivacyUnsafe
+{
+  genCreateX = async (notification: AbstractNotification): Promise<void> => {
     await MongoNotificationCollection.insertOne(notification);
   };
 
   genFetchX = async (
     userId: string,
     notificationUid: string
-  ): Promise<Object> => {
+  ): Promise<Object | null> => {
     return await MongoNotificationCollection.findOne({
       ownerUuid: userId,
       uuid: notificationUid,
