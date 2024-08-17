@@ -2,8 +2,10 @@ import { Logger } from "../logger";
 import { AbstractNotification } from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
-import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
+
+import { RepositoryFactory } from "../repositories/repositoryFactory";
+import { DatabaseType } from "../configs/database.config";
 
 const notificationFactoryMap: {
   [key: string]: (raw: Object) => AbstractNotification;
@@ -18,16 +20,20 @@ export type EnabledNotificationType = ReturnType<
   (typeof notificationFactoryMap)[keyof typeof notificationFactoryMap]
 >;
 
+export type EnabledNotificationResponseType = Awaited<
+  ReturnType<EnabledNotificationType["genResponse"]>
+>;
+
 export class NotificationService {
+  private notificationRepository: INotificationRepository;
   private userNotificationMetadataService: UserNotificationMetadataService;
-  constructor(
-    private viewerUserId: string,
-    private notificationRepository: INotificationRepository,
-    private userNotificationMetadataRepository: IUserNotificationMetadataRepository
-  ) {
+
+  constructor(private readonly viewerUserId: string) {
+    const repository = RepositoryFactory.getRepositoryX(DatabaseType.MongoDB);
+    this.notificationRepository = repository.notificationRepository;
+
     this.userNotificationMetadataService = new UserNotificationMetadataService(
-      viewerUserId,
-      userNotificationMetadataRepository
+      viewerUserId
     );
   }
 
@@ -65,7 +71,9 @@ export class NotificationService {
     ).filter((notif) => notif != null) as EnabledNotificationType[];
   };
 
-  genFetchAllResponseForUser = async (): Promise<EnabledNotificationType[]> => {
+  genFetchAllResponseForUserX = async (): Promise<
+    EnabledNotificationType[]
+  > => {
     const notifications = await this.genFetchAllForUserX();
     return (
       await Promise.all(
@@ -90,9 +98,7 @@ export class NotificationService {
   genMarkAsReadX = async (uuid: string): Promise<void> => {
     const notifPerm = await NotificationPerm.fromNotificationUuid(
       this.viewerUserId,
-      uuid,
-      this.notificationRepository,
-      this.userNotificationMetadataRepository
+      uuid
     );
     if (!notifPerm.viewerIsOwner) {
       throw new Error(
@@ -123,9 +129,7 @@ export class NotificationService {
   ): Promise<AbstractNotification | null> => {
     const perm = await NotificationPerm.fromNotificationUuid(
       this.viewerUserId,
-      notificationUid,
-      this.notificationRepository,
-      this.userNotificationMetadataRepository
+      notificationUid
     );
     if (!perm.canView) {
       throw new Error(
