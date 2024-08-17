@@ -1,5 +1,3 @@
-<!-- README file for this project -->
-
 # User Notification Framework
 
 This project provides a framework to manage user notifications.
@@ -7,9 +5,11 @@ This project provides a framework to manage user notifications.
 ## Installation
 
 1. Clone the repository:
-   ````bash
-   git clone [invalid URL removed]   ```
-   ````
+
+```bash
+git clone https://github.com/Jhotika/notification-framework
+```
+
 2. To install the dependencies, run:
 
 ```bash
