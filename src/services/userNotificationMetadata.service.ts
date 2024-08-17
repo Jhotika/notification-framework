@@ -1,11 +1,15 @@
+import { DatabaseType } from "../configs/database.config";
 import { Logger } from "../logger";
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
+import { RepositoryFactory } from "../repositories/repositoryFactory";
 
 export class UserNotificationMetadataService {
-  constructor(
-    private viewerUserId: string,
-    private repository: IUserNotificationMetadataRepository
-  ) {}
+  private readonly repository: IUserNotificationMetadataRepository;
+
+  constructor(private readonly viewerUserId: string) {
+    const repository = RepositoryFactory.getRepositoryX(DatabaseType.MongoDB);
+    this.repository = repository.userNotificationMetadataRepository;
+  }
 
   genIfUserHasNewNotificationX = async (): Promise<boolean> => {
     try {
