@@ -44,7 +44,7 @@ export class NotificationService {
     const notificationType = rawNotification["type"] as string;
     const factoryMethod = notificationFactoryMap[notificationType];
     if (!factoryMethod) {
-      Logger.error(
+      new Logger().error(
         `No factory method found for notification type ${notificationType}`
       );
       return null;
@@ -89,7 +89,9 @@ export class NotificationService {
     try {
       await this.notificationRepository.genMarkAllAsReadX();
     } catch (error) {
-      Logger.error(`Error marking all notifications as read: ${error.message}`);
+      new Logger().error(
+        `Error marking all notifications as read: ${error.message}`
+      );
       throw new Error(
         "Error marking all notifications as read. Please try again later."
       );
@@ -113,13 +115,13 @@ export class NotificationService {
     try {
       await this.notificationRepository.genCreateX(notification);
     } catch (error) {
-      Logger.error(`Error saving notification: ${error.message}`);
+      new Logger().error(`Error saving notification: ${error.message}`);
       return false;
     }
     try {
       await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
     } catch (error) {
-      Logger.error(`Error updating watermark for user: ${error.message}`);
+      new Logger().error(`Error updating watermark for user: ${error.message}`);
     } finally {
       return true;
     }
@@ -144,7 +146,7 @@ export class NotificationService {
       );
       return maybeNotification ? this.factory(maybeNotification) : null;
     } catch (error) {
-      Logger.error(
+      new Logger().error(
         `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
       );
       return null;

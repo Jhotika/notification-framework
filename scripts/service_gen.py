@@ -14,7 +14,7 @@ def create_notification_method(param):
       )
       await NotificationService.genSave(notification)
     }} catch (e) {{
-      Logger.error(
+      new Logger().error(
           "Failed to create {param} notification for user {{ownerUuid}}: " + e.message?.toString()
       )
     }}

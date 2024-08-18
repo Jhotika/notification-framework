@@ -23,7 +23,7 @@ export class UserNotificationMetadataService {
       const lastFetchTime = userMetadata?.lastFetchTime ?? 0;
       return latestNotifCreateTime > lastFetchTime;
     } catch (e) {
-      Logger.error(`Error fetching user metadata for ${this.viewerUserId}`);
+      new Logger().error(`Error fetching user metadata for ${this.viewerUserId}`);
       throw e;
     }
   };
@@ -32,7 +32,7 @@ export class UserNotificationMetadataService {
     try {
       await this.repository.genUpdateWatermarkForUserX();
     } catch (e) {
-      Logger.error(`Error updating watermark for ${this.viewerUserId}`);
+      new Logger().error(`Error updating watermark for ${this.viewerUserId}`);
       throw e;
     }
   };
