@@ -9,7 +9,9 @@
     "noEmit": true
   },
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./lib/**/*.ts",
+    "./configs/**/*.ts"
   ],
   "exclude": [
     "node_modules",

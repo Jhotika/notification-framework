@@ -5,7 +5,7 @@ import { INotificationRepository } from "../repositories/INotificationRepository
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
 import { RepositoryFactory } from "../repositories/repositoryFactory";
-import { DatabaseType } from "../configs/database.config";
+import { DatabaseType } from "../../configs/database.config";
 
 const notificationFactoryMap: {
   [key: string]: (raw: Object) => AbstractNotification;

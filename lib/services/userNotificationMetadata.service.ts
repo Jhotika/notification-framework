@@ -1,4 +1,4 @@
-import { DatabaseType } from "../configs/database.config";
+import { DatabaseType } from "../../configs/database.config";
 import { Logger } from "../logger";
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
 import { RepositoryFactory } from "../repositories/repositoryFactory";

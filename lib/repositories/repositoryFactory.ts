@@ -1,4 +1,4 @@
-import { DatabaseType } from "../configs/database.config";
+import { DatabaseType } from "../../configs/database.config";
 import { MongoNotificationRepository } from "./mongo/mongoNotificationRepository";
 import { MongoUserNotificationMetadataRepository } from "./mongo/mongoUserNotificationMetadataRepository";
 import { INotificationRepository } from "./INotificationRepository";
