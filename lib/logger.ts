@@ -5,6 +5,7 @@ interface ILogger {
   error(message: any, ...optionalParams: any[]): void;
 }
 
+// TODO(Taman): instantiate this class in the entry point of the framework.
 export class Logger implements ILogger {
   constructor() {}
   warn(message: any, ...optionalParams: any[]): void {
