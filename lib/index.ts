@@ -1,6 +1,7 @@
 import {
   DatabaseConfig,
   verifyDatabaseConfig,
+  DatabaseType,
 } from "../configs/database.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
@@ -66,4 +67,4 @@ class NotificationFramework {
 }
 
 export default NotificationFramework;
-export { Errors };
+export { Errors, DatabaseType };

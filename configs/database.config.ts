@@ -4,7 +4,7 @@ export enum DatabaseType {
   InMemory = "in-memory",
 }
 
-export interface MongoConfig {
+interface MongoConfig {
   user: string;
   password: string;
   clusterUri: string;
