@@ -13,7 +13,7 @@ export abstract class AbstractNotification {
     public payload: Record<string, any>,
     public ownerUuid: string,
     public isRead: boolean,
-    public createdAtInMs: number
+    public createdAt: number // Unix timestamp in milliseconds
   ) {
     this.type = type;
   }

@@ -19,7 +19,7 @@ export class MongoUserNotificationMetadataRepository
       .sort({ createTime: -1 })
       .limit(1)
       .toArray();
-    return notifications.length > 0 ? notifications[0].createdAtInMs : 0;
+    return notifications.length > 0 ? notifications[0].createdAt : 0;
   };
 
   genUpdateWatermarkForUserX = async (): Promise<void> => {
