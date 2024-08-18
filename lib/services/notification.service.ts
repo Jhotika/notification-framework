@@ -5,6 +5,7 @@ import { INotificationRepository } from "../repositories/INotificationRepository
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
+import { UserPermissionError } from "../errors/userPermissionError";
 
 const notificationFactoryMap: {
   [key: string]: (raw: Object) => AbstractNotification;
@@ -118,7 +119,7 @@ export class NotificationService {
       notif
     );
     if (!notifPerm.viewerIsOwner) {
-      throw new Error(
+      throw new UserPermissionError(
         "User doesn't have permission to mark this notification as read"
       );
     }
@@ -156,7 +157,7 @@ export class NotificationService {
         maybeNotification as AbstractNotification
       );
       if (!perm.canView) {
-        throw new Error(
+        throw new UserPermissionError(
           "User ${this.viewerUserId} doesn't have permission to view this notification: ${notificationUid}"
         );
       }

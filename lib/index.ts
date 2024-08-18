@@ -2,6 +2,7 @@ import {
   DatabaseConfig,
   verifyDatabaseConfig,
 } from "../configs/database.config";
+import { Errors } from "./errors";
 import type { ILogger } from "./logger";
 import { RepositoryFactory } from "./repositories/repositoryFactory";
 import { NotificationService } from "./services/notification.service";
@@ -65,3 +66,4 @@ class NotificationFramework {
 }
 
 export default NotificationFramework;
+export { Errors };
