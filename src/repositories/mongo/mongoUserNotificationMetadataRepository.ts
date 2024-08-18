@@ -2,39 +2,49 @@ import {
   IUserNotificationMetadata,
   IUserNotificationMetadataRepository,
 } from "../IUserNotificationMetadataRepository";
-import { MongoNotificationUserMetadataCollection } from "./mongoCollections";
+import {
+  MongoNotificationCollection,
+  MongoNotificationUserMetadataCollection,
+} from "./mongoCollections";
 
 export class MongoUserNotificationMetadataRepository
   implements IUserNotificationMetadataRepository
 {
-  genFetchLatestCreationTimeForUserX = async (
-    userId: string
-  ): Promise<number> => {
-    const userMetadata = await MongoNotificationUserMetadataCollection.findOne({
-      userId: userId,
-    });
-    return userMetadata?.latestNotifCreateTime ?? 0;
+  constructor(public readonly viewerId: string) {}
+
+  genFetchLatestCreationTimeForUserX = async (): Promise<number> => {
+    const notifications = await MongoNotificationCollection.find({
+      ownerUuid: this.viewerId,
+    })
+      .sort({ createTime: -1 })
+      .limit(1)
+      .toArray();
+    return notifications.length > 0 ? notifications[0].createdAtInMs : 0;
   };
 
-  genUpdateWatermarkForUserX = async (userId: string): Promise<void> => {
+  genUpdateWatermarkForUserX = async (): Promise<void> => {
     const lastFetchTime = Date.now();
     await MongoNotificationUserMetadataCollection.updateOne(
-      { userId: userId },
+      { userId: this.viewerId },
       { $set: { lastFetchTime: lastFetchTime } },
       { upsert: true }
     );
   };
 
-  genFetchUserMetadataX = async (
-    userId: string
-  ): Promise<IUserNotificationMetadata> => {
+  genFetchUserMetadataX = async (): Promise<IUserNotificationMetadata> => {
     const userMetadata = await MongoNotificationUserMetadataCollection.findOne({
-      userId: userId,
+      userId: this.viewerId,
     });
     return {
-      userId: userId,
-      latestNotifCreateTime: userMetadata?.latestNotifCreateTime ?? 0,
+      userId: this.viewerId,
       lastFetchTime: userMetadata?.lastFetchTime ?? 0,
     };
+  };
+
+  genFetchNumUnreadNotificationsX = async (): Promise<number> => {
+    return await MongoNotificationCollection.countDocuments({
+      ownerUuid: this.viewerId,
+      isRead: false,
+    });
   };
 }

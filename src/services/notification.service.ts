@@ -29,7 +29,10 @@ export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
 
   constructor(private readonly viewerUserId: string) {
-    const repository = RepositoryFactory.getRepositoryX(DatabaseType.MongoDB);
+    const repository = RepositoryFactory.getRepositoryX(
+      viewerUserId,
+      DatabaseType.MongoDB
+    );
     this.notificationRepository = repository.notificationRepository;
 
     this.userNotificationMetadataService = new UserNotificationMetadataService(
@@ -59,9 +62,7 @@ export class NotificationService {
     EnabledNotificationType[]
   > => {
     const rawNotifications =
-      await this.notificationRepository.genFetchAllRawForUserX(
-        this.viewerUserId
-      );
+      await this.notificationRepository.genFetchAllRawForViewerX();
     return (
       await Promise.all(
         rawNotifications.map((rawNotification: Object) =>
@@ -86,7 +87,7 @@ export class NotificationService {
 
   genMarkAllAsReadX = async (): Promise<void> => {
     try {
-      await this.notificationRepository.genMarkAllAsReadX(this.viewerUserId);
+      await this.notificationRepository.genMarkAllAsReadX();
     } catch (error) {
       Logger.error(`Error marking all notifications as read: ${error.message}`);
       throw new Error(
@@ -139,7 +140,6 @@ export class NotificationService {
 
     try {
       const maybeNotification = await this.notificationRepository.genFetchX(
-        this.viewerUserId,
         notificationUid
       );
       return maybeNotification ? this.factory(maybeNotification) : null;

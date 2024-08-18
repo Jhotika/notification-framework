@@ -7,23 +7,22 @@ export class MongoNotificationRepository
   implements INotificationRepository, IPrivacyUnsafe
 {
   static collection = MongoNotificationCollection;
+  constructor(private readonly viewerId: string) {}
+
   genCreateX = async (notification: AbstractNotification): Promise<void> => {
     await MongoNotificationCollection.insertOne(notification);
   };
 
-  genFetchX = async (
-    userId: string,
-    notificationUid: string
-  ): Promise<Object | null> => {
+  genFetchX = async (notificationUid: string): Promise<Object | null> => {
     return await MongoNotificationCollection.findOne({
-      ownerUuid: userId,
+      ownerUuid: this.viewerId,
       uuid: notificationUid,
     });
   };
 
-  genMarkAllAsReadX = async (userId: string): Promise<void> => {
+  genMarkAllAsReadX = async (): Promise<void> => {
     await MongoNotificationCollection.updateMany(
-      { ownerUuid: userId },
+      { ownerUuid: this.viewerId },
       { $set: { isRead: true } }
     );
   };
@@ -35,9 +34,9 @@ export class MongoNotificationRepository
     );
   };
 
-  genFetchAllRawForUserX = async (userId: string): Promise<Array<Object>> => {
+  genFetchAllRawForViewerX = async (): Promise<Array<Object>> => {
     return await MongoNotificationCollection.find({
-      ownerUuid: userId,
+      ownerUuid: this.viewerId,
     }).toArray();
   };
 }

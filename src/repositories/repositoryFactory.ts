@@ -17,6 +17,7 @@ export class RepositoryFactory {
    * @throws DatabaseNotSupportedError
    */
   static getRepositoryX = (
+    viewerId: string,
     enabledDbType?: DatabaseType
   ): {
     notificationRepository: INotificationRepository;
@@ -26,9 +27,9 @@ export class RepositoryFactory {
     switch (dbType) {
       case DatabaseType.MongoDB:
         return {
-          notificationRepository: new MongoNotificationRepository(),
+          notificationRepository: new MongoNotificationRepository(viewerId),
           userNotificationMetadataRepository:
-            new MongoUserNotificationMetadataRepository(),
+            new MongoUserNotificationMetadataRepository(viewerId),
         };
       default:
         throw new DatabaseNotSupportedError(

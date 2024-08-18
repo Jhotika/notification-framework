@@ -7,16 +7,19 @@ export class UserNotificationMetadataService {
   private readonly repository: IUserNotificationMetadataRepository;
 
   constructor(private readonly viewerUserId: string) {
-    const repository = RepositoryFactory.getRepositoryX(DatabaseType.MongoDB);
+    const repository = RepositoryFactory.getRepositoryX(
+      viewerUserId,
+      DatabaseType.MongoDB
+    );
     this.repository = repository.userNotificationMetadataRepository;
   }
 
   genIfUserHasNewNotificationX = async (): Promise<boolean> => {
     try {
-      const userMetadata = await this.repository.genFetchUserMetadataX(
-        this.viewerUserId
-      );
-      const latestNotifCreateTime = userMetadata?.latestNotifCreateTime ?? 0;
+      const [userMetadata, latestNotifCreateTime] = await Promise.all([
+        this.repository.genFetchUserMetadataX(),
+        this.repository.genFetchLatestCreationTimeForUserX(),
+      ]);
       const lastFetchTime = userMetadata?.lastFetchTime ?? 0;
       return latestNotifCreateTime > lastFetchTime;
     } catch (e) {
@@ -27,7 +30,7 @@ export class UserNotificationMetadataService {
 
   genUpdateWatermarkForUserX = async (): Promise<void> => {
     try {
-      await this.repository.genUpdateWatermarkForUserX(this.viewerUserId);
+      await this.repository.genUpdateWatermarkForUserX();
     } catch (e) {
       Logger.error(`Error updating watermark for ${this.viewerUserId}`);
       throw e;
