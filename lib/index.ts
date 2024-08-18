@@ -11,6 +11,12 @@ class NotificationFramework {
   private notificationService: NotificationService;
   private userNotificationMetadataService: UserNotificationMetadataService;
 
+  /**
+   * Constructs a new instance of NotificationFramework.
+   * @param viewerId - The ID of the viewer.
+   * @param logger - The logger instance.
+   * @param dbConfig - The database configuration.
+   */
   constructor(
     private readonly viewerId: string,
     private readonly logger: ILogger,
@@ -41,10 +47,18 @@ class NotificationFramework {
     }
   }
 
+  /**
+   * Gets the NotificationService instance.
+   * @returns A NotificationService instance.
+   */
   getNotificationService = (): NotificationService => {
     return this.notificationService;
   };
 
+  /**
+   * Gets the UserNotificationMetadataService instance.
+   * @returns A UserNotificationMetadataService instance.
+   */
   getUserNotificationMetadataService = (): UserNotificationMetadataService => {
     return this.userNotificationMetadataService;
   };
