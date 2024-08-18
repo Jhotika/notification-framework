@@ -1,24 +1,25 @@
 import { AbstractNotification } from "./models/abstractNotification";
-import { NotificationService } from "./services/notification.service";
 
 export class NotificationPerm {
   constructor(
     public viewerUid: string,
-    public notification: AbstractNotification
+    public notification: {
+      ownerUuid: string;
+    }
   ) {}
 
-  static fromNotificationUuid = async (
+  static fromNotification = async (
     viewerUid: string,
-    notificationUid: string
+    notification: AbstractNotification
   ) => {
-    const notificationService = new NotificationService(viewerUid);
-    const notification = await notificationService.genFetchNotificationX(
-      notificationUid
-    );
-    if (!notification) {
-      throw new Error("Notification not found");
-    }
     return new NotificationPerm(viewerUid, notification);
+  };
+
+  static fromRawNotification = async (
+    viewerUid: string,
+    rawNotification: Object
+  ) => {
+    return new NotificationPerm(viewerUid, rawNotification["ownerUuid"]);
   };
 
   get viewerIsOwner() {

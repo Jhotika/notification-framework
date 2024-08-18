@@ -1,18 +1,12 @@
-import { DatabaseType } from "../../configs/database.config";
-import { Logger } from "../logger";
+import type { ILogger } from "../logger";
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
-import { RepositoryFactory } from "../repositories/repositoryFactory";
 
 export class UserNotificationMetadataService {
-  private readonly repository: IUserNotificationMetadataRepository;
-
-  constructor(private readonly viewerUserId: string) {
-    const repository = RepositoryFactory.getRepositoryX(
-      viewerUserId,
-      DatabaseType.MongoDB
-    );
-    this.repository = repository.userNotificationMetadataRepository;
-  }
+  constructor(
+    private readonly viewerUserId: string,
+    private readonly repository: IUserNotificationMetadataRepository,
+    private readonly logger: ILogger
+  ) {}
 
   genIfUserHasNewNotificationX = async (): Promise<boolean> => {
     try {
@@ -23,7 +17,9 @@ export class UserNotificationMetadataService {
       const lastFetchTime = userMetadata?.lastFetchTime ?? 0;
       return latestNotifCreateTime > lastFetchTime;
     } catch (e) {
-      new Logger().error(`Error fetching user metadata for ${this.viewerUserId}`);
+      this.logger.error(
+        `Error fetching user metadata for ${this.viewerUserId}`
+      );
       throw e;
     }
   };
@@ -32,7 +28,7 @@ export class UserNotificationMetadataService {
     try {
       await this.repository.genUpdateWatermarkForUserX();
     } catch (e) {
-      new Logger().error(`Error updating watermark for ${this.viewerUserId}`);
+      this.logger.error(`Error updating watermark for ${this.viewerUserId}`);
       throw e;
     }
   };
