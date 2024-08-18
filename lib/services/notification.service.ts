@@ -1,11 +1,11 @@
-import { Logger } from "../logger";
+import type { ILogger } from "../logger";
 import { AbstractNotification } from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
-import { RepositoryFactory } from "../repositories/repositoryFactory";
-import { DatabaseType } from "../../configs/database.config";
+import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
+import { UserPermissionError } from "../errors/userPermissionError";
 
 const notificationFactoryMap: {
   [key: string]: (raw: Object) => AbstractNotification;
@@ -25,18 +25,18 @@ export type EnabledNotificationResponseType = Awaited<
 >;
 
 export class NotificationService {
-  private notificationRepository: INotificationRepository;
   private userNotificationMetadataService: UserNotificationMetadataService;
 
-  constructor(private readonly viewerUserId: string) {
-    const repository = RepositoryFactory.getRepositoryX(
-      viewerUserId,
-      DatabaseType.MongoDB
-    );
-    this.notificationRepository = repository.notificationRepository;
-
+  constructor(
+    private readonly viewerUserId: string,
+    private readonly notificationRepository: INotificationRepository,
+    private readonly userNotificationMetadataRepository: IUserNotificationMetadataRepository,
+    private readonly logger: ILogger
+  ) {
     this.userNotificationMetadataService = new UserNotificationMetadataService(
-      viewerUserId
+      viewerUserId,
+      this.userNotificationMetadataRepository,
+      this.logger
     );
   }
 
@@ -44,7 +44,7 @@ export class NotificationService {
     const notificationType = rawNotification["type"] as string;
     const factoryMethod = notificationFactoryMap[notificationType];
     if (!factoryMethod) {
-      new Logger().error(
+      this.logger.error(
         `No factory method found for notification type ${notificationType}`
       );
       return null;
@@ -89,7 +89,7 @@ export class NotificationService {
     try {
       await this.notificationRepository.genMarkAllAsReadX();
     } catch (error) {
-      new Logger().error(
+      this.logger.error(
         `Error marking all notifications as read: ${error.message}`
       );
       throw new Error(
@@ -99,12 +99,27 @@ export class NotificationService {
   };
 
   genMarkAsReadX = async (uuid: string): Promise<void> => {
-    const notifPerm = await NotificationPerm.fromNotificationUuid(
+    let notif: AbstractNotification | null;
+    try {
+      notif = await this.genFetchNotificationX(uuid);
+      if (!notif) {
+        throw new Error(`Notification not found: ${uuid}`);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
+      );
+      throw new Error(
+        `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
+      );
+    }
+
+    const notifPerm = await NotificationPerm.fromNotification(
       this.viewerUserId,
-      uuid
+      notif
     );
     if (!notifPerm.viewerIsOwner) {
-      throw new Error(
+      throw new UserPermissionError(
         "User doesn't have permission to mark this notification as read"
       );
     }
@@ -115,13 +130,13 @@ export class NotificationService {
     try {
       await this.notificationRepository.genCreateX(notification);
     } catch (error) {
-      new Logger().error(`Error saving notification: ${error.message}`);
+      this.logger.error(`Error saving notification: ${error.message}`);
       return false;
     }
     try {
       await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
     } catch (error) {
-      new Logger().error(`Error updating watermark for user: ${error.message}`);
+      this.logger.error(`Error updating watermark for user: ${error.message}`);
     } finally {
       return true;
     }
@@ -130,23 +145,25 @@ export class NotificationService {
   genFetchNotificationX = async (
     notificationUid: string
   ): Promise<AbstractNotification | null> => {
-    const perm = await NotificationPerm.fromNotificationUuid(
-      this.viewerUserId,
-      notificationUid
-    );
-    if (!perm.canView) {
-      throw new Error(
-        "User ${this.viewerUserId} doesn't have permission to view this notification: ${notificationUid}"
-      );
-    }
-
     try {
       const maybeNotification = await this.notificationRepository.genFetchX(
         notificationUid
       );
+      if (!maybeNotification) {
+        return null;
+      }
+      const perm = await NotificationPerm.fromNotification(
+        this.viewerUserId,
+        maybeNotification as AbstractNotification
+      );
+      if (!perm.canView) {
+        throw new UserPermissionError(
+          "User ${this.viewerUserId} doesn't have permission to view this notification: ${notificationUid}"
+        );
+      }
       return maybeNotification ? this.factory(maybeNotification) : null;
     } catch (error) {
-      new Logger().error(
+      this.logger.error(
         `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
       );
       return null;
