@@ -3,7 +3,7 @@ import {
   verifyDatabaseConfig,
 } from "../configs/database.config";
 import { Errors } from "./errors";
-import type { ILogger } from "./logger";
+import { Logger, type ILogger } from "./logger";
 import { RepositoryFactory } from "./repositories/repositoryFactory";
 import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
@@ -20,7 +20,7 @@ class NotificationFramework {
    */
   constructor(
     private readonly viewerId: string,
-    private readonly logger: ILogger,
+    private readonly logger: ILogger = new Logger(),
     private readonly dbConfig: DatabaseConfig
   ) {
     try {
