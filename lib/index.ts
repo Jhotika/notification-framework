@@ -16,23 +16,29 @@ class NotificationFramework {
     private readonly logger: ILogger,
     private readonly dbConfig: DatabaseConfig
   ) {
-    verifyDatabaseConfig(this.dbConfig);
-    const repository = RepositoryFactory.getRepositoryX(
-      this.viewerId,
-      this.dbConfig.type
-    );
-    this.notificationService = new NotificationService(
-      this.viewerId,
-      repository.notificationRepository,
-      repository.userNotificationMetadataRepository,
-      this.logger
-    );
+    try {
+      verifyDatabaseConfig(this.dbConfig);
+      const repository = RepositoryFactory.getRepositoryX(
+        this.viewerId,
+        this.dbConfig.type
+      );
+      this.notificationService = new NotificationService(
+        this.viewerId,
+        repository.notificationRepository,
+        repository.userNotificationMetadataRepository,
+        this.logger
+      );
 
-    this.userNotificationMetadataService = new UserNotificationMetadataService(
-      this.viewerId,
-      repository.userNotificationMetadataRepository,
-      this.logger
-    );
+      this.userNotificationMetadataService =
+        new UserNotificationMetadataService(
+          this.viewerId,
+          repository.userNotificationMetadataRepository,
+          this.logger
+        );
+    } catch (error) {
+      this.logger.error("Error initializing NotificationFramework:", error);
+      throw error; // Re-throw
+    }
   }
 
   getNotificationService = (): NotificationService => {
