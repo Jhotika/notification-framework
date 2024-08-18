@@ -8,7 +8,7 @@ import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
 class NotificationFramework {
-  private notifationService: NotificationService;
+  private notificationService: NotificationService;
   private userNotificationMetadataService: UserNotificationMetadataService;
 
   constructor(
@@ -21,7 +21,7 @@ class NotificationFramework {
       this.viewerId,
       this.dbConfig.type
     );
-    this.notifationService = new NotificationService(
+    this.notificationService = new NotificationService(
       this.viewerId,
       repository.notificationRepository,
       repository.userNotificationMetadataRepository,
@@ -36,7 +36,7 @@ class NotificationFramework {
   }
 
   getNotificationService = (): NotificationService => {
-    return this.notifationService;
+    return this.notificationService;
   };
 
   getUserNotificationMetadataService = (): UserNotificationMetadataService => {
