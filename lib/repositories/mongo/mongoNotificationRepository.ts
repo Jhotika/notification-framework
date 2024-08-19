@@ -1,42 +1,43 @@
 import { AbstractNotification } from "../../models/abstractNotification";
 import { INotificationRepository } from "../INotificationRepository";
-import { MongoNotificationCollection } from "./mongoCollections";
 import { IPrivacyUnsafe } from "../IUserNotificationMetadataRepository";
+import { MongoNotificationCollection } from "./mongoCollections";
 
 export class MongoNotificationRepository
   implements INotificationRepository, IPrivacyUnsafe
 {
-  static collection = MongoNotificationCollection;
-  constructor(private readonly viewerId: string) {}
+  constructor(
+    private readonly viewerId: string,
+    private readonly collection = MongoNotificationCollection
+  ) {}
 
   genCreateX = async (notification: AbstractNotification): Promise<void> => {
-    await MongoNotificationCollection.insertOne(notification);
+    await this.collection.insertOne(notification);
   };
 
   genFetchX = async (notificationUid: string): Promise<Object | null> => {
-    return await MongoNotificationCollection.findOne({
+    return await this.collection.findOne({
       ownerUuid: this.viewerId,
       uuid: notificationUid,
     });
   };
 
   genMarkAllAsReadX = async (): Promise<void> => {
-    await MongoNotificationCollection.updateMany(
+    await this.collection.updateMany(
       { ownerUuid: this.viewerId },
       { $set: { isRead: true } }
     );
   };
 
   genMarkAsReadX = async (uid: string): Promise<void> => {
-    await MongoNotificationCollection.updateOne(
-      { uuid: uid },
-      { $set: { isRead: true } }
-    );
+    await this.collection.updateOne({ uuid: uid }, { $set: { isRead: true } });
   };
 
   genFetchAllRawForViewerX = async (): Promise<Array<Object>> => {
-    return await MongoNotificationCollection.find({
-      ownerUuid: this.viewerId,
-    }).toArray();
+    return await this.collection
+      .find({
+        ownerUuid: this.viewerId,
+      })
+      .toArray();
   };
 }

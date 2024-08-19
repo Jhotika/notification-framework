@@ -16,10 +16,6 @@ const notificationFactoryMap: {
   // For example, if the type of the notification is "A", the factory method will return an instance of ANotification.
 };
 
-export type EnabledNotificationType = ReturnType<
-  (typeof notificationFactoryMap)[keyof typeof notificationFactoryMap]
->;
-
 export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
 
@@ -36,7 +32,7 @@ export class NotificationService {
     );
   }
 
-  factory = (rawNotification: Object): EnabledNotificationType | null => {
+  factory = (rawNotification: Object): AbstractNotification | null => {
     const notificationType = rawNotification["type"] as string;
     const factoryMethod = notificationFactoryMap[notificationType];
     if (!factoryMethod) {
@@ -54,9 +50,7 @@ export class NotificationService {
     throw new Error("Not implemented");
   };
 
-  private genFetchAllForUserX = async (): Promise<
-    EnabledNotificationType[]
-  > => {
+  private genFetchAllForUserX = async (): Promise<AbstractNotification[]> => {
     const rawNotifications =
       await this.notificationRepository.genFetchAllRawForViewerX();
     return (
@@ -65,12 +59,10 @@ export class NotificationService {
           this.factory(rawNotification)
         )
       )
-    ).filter((notif) => notif != null) as EnabledNotificationType[];
+    ).filter((notif) => notif != null) as AbstractNotification[];
   };
 
-  genFetchAllResponseForUserX = async (): Promise<
-    EnabledNotificationType[]
-  > => {
+  genFetchAllResponseForUserX = async (): Promise<AbstractNotification[]> => {
     const notifications = await this.genFetchAllForUserX();
     return (
       await Promise.all(
@@ -78,7 +70,7 @@ export class NotificationService {
           notification ? notification.genResponse() : null
         )
       )
-    ).filter((notif) => notif != null) as EnabledNotificationType[];
+    ).filter((notif) => notif != null) as AbstractNotification[];
   };
 
   genMarkAllAsReadX = async (): Promise<void> => {
@@ -122,7 +114,7 @@ export class NotificationService {
     await this.notificationRepository.genMarkAsReadX(uuid);
   };
 
-  genSave = async (notification: EnabledNotificationType): Promise<boolean> => {
+  genSave = async (notification: AbstractNotification): Promise<boolean> => {
     try {
       await this.notificationRepository.genCreateX(notification);
     } catch (error) {

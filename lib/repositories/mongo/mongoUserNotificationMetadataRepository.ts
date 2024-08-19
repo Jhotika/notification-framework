@@ -10,12 +10,17 @@ import {
 export class MongoUserNotificationMetadataRepository
   implements IUserNotificationMetadataRepository
 {
-  constructor(public readonly viewerId: string) {}
+  constructor(
+    public readonly viewerId: string,
+    private readonly notificationCollection = MongoNotificationCollection,
+    private readonly userMetadataCollection = MongoNotificationUserMetadataCollection
+  ) {}
 
   genFetchLatestCreationTimeForUserX = async (): Promise<number> => {
-    const notifications = await MongoNotificationCollection.find({
-      ownerUuid: this.viewerId,
-    })
+    const notifications = await this.notificationCollection
+      .find({
+        ownerUuid: this.viewerId,
+      })
       .sort({ createTime: -1 })
       .limit(1)
       .toArray();
@@ -24,7 +29,7 @@ export class MongoUserNotificationMetadataRepository
 
   genUpdateWatermarkForUserX = async (): Promise<void> => {
     const lastFetchTime = Date.now();
-    await MongoNotificationUserMetadataCollection.updateOne(
+    await this.userMetadataCollection.updateOne(
       { userId: this.viewerId },
       { $set: { lastFetchTime: lastFetchTime } },
       { upsert: true }
@@ -32,7 +37,7 @@ export class MongoUserNotificationMetadataRepository
   };
 
   genFetchUserMetadataX = async (): Promise<IUserNotificationMetadata> => {
-    const userMetadata = await MongoNotificationUserMetadataCollection.findOne({
+    const userMetadata = await this.userMetadataCollection.findOne({
       userId: this.viewerId,
     });
     return {
@@ -42,7 +47,7 @@ export class MongoUserNotificationMetadataRepository
   };
 
   genFetchNumUnreadNotificationsX = async (): Promise<number> => {
-    return await MongoNotificationCollection.countDocuments({
+    return await this.notificationCollection.countDocuments({
       ownerUuid: this.viewerId,
       isRead: false,
     });

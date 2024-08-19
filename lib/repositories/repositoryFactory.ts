@@ -1,10 +1,11 @@
-import { DatabaseType } from "../../configs/database.config";
+import { DatabaseConfig, DatabaseType } from "../../configs/database.config";
 import { MongoNotificationRepository } from "./mongo/mongoNotificationRepository";
 import { MongoUserNotificationMetadataRepository } from "./mongo/mongoUserNotificationMetadataRepository";
 import { INotificationRepository } from "./INotificationRepository";
 import { IUserNotificationMetadataRepository } from "./IUserNotificationMetadataRepository";
 
 import { DatabaseNotSupportedError } from "../errors/databaseNotSupportedError";
+import { type MongoCollectionConfig } from "../../configs/database.config";
 
 export class RepositoryFactory {
   /**
@@ -18,18 +19,32 @@ export class RepositoryFactory {
    */
   static getRepositoryX = (
     viewerId: string,
-    enabledDbType?: DatabaseType
+    dbConfig: DatabaseConfig
   ): {
     notificationRepository: INotificationRepository;
     userNotificationMetadataRepository: IUserNotificationMetadataRepository;
   } => {
-    const dbType: string = enabledDbType ?? process.env.ENABLED_DB_TYPE ?? "";
+    const dbType: string = dbConfig.type ?? process.env.ENABLED_DB_TYPE ?? "";
     switch (dbType) {
       case DatabaseType.MongoDB:
         return {
           notificationRepository: new MongoNotificationRepository(viewerId),
           userNotificationMetadataRepository:
             new MongoUserNotificationMetadataRepository(viewerId),
+        };
+      case DatabaseType.MongoDocuments:
+        const config = dbConfig.config as MongoCollectionConfig;
+        return {
+          notificationRepository: new MongoNotificationRepository(
+            viewerId,
+            config.notificationCollection
+          ),
+          userNotificationMetadataRepository:
+            new MongoUserNotificationMetadataRepository(
+              viewerId,
+              config.notificationCollection,
+              config.userNotificationMetadataCollection
+            ),
         };
       default:
         throw new DatabaseNotSupportedError(
