@@ -2,6 +2,8 @@ import {
   DatabaseConfig,
   verifyDatabaseConfig,
   DatabaseType,
+  MongoDbConfig,
+  MongoCollectionConfig,
 } from "../configs/database.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
@@ -10,8 +12,8 @@ import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
 class NotificationFramework {
-  private notificationService: NotificationService;
-  private userNotificationMetadataService: UserNotificationMetadataService;
+  public notificationService: NotificationService;
+  public userNotificationMetadataService: UserNotificationMetadataService;
 
   /**
    * Constructs a new instance of NotificationFramework.
@@ -22,13 +24,13 @@ class NotificationFramework {
   constructor(
     private readonly viewerId: string,
     private readonly logger: ILogger = new Logger(),
-    private readonly dbConfig: DatabaseConfig
+    dbConfig: DatabaseConfig
   ) {
     try {
-      verifyDatabaseConfig(this.dbConfig);
+      verifyDatabaseConfig(dbConfig);
       const repository = RepositoryFactory.getRepositoryX(
         this.viewerId,
-        this.dbConfig.type
+        dbConfig
       );
       this.notificationService = new NotificationService(
         this.viewerId,
@@ -48,6 +50,32 @@ class NotificationFramework {
       throw error; // Re-throw
     }
   }
+
+  static withMongoCollections = (
+    viewerId: string,
+    logger: ILogger,
+    mongoCollections: MongoCollectionConfig
+  ): NotificationFramework => {
+    return new NotificationFramework(viewerId, logger, {
+      type: DatabaseType.MongoDocuments,
+      config: {
+        notificationCollection: mongoCollections.notificationCollection,
+        userNotificationMetadataCollection:
+          mongoCollections.userNotificationMetadataCollection,
+      },
+    });
+  };
+
+  static withMongoDb = (
+    viewerId: string,
+    logger: ILogger,
+    mongoConfig: MongoDbConfig
+  ): NotificationFramework => {
+    return new NotificationFramework(viewerId, logger, {
+      type: DatabaseType.MongoDB,
+      config: mongoConfig,
+    });
+  };
 
   /**
    * Gets the NotificationService instance.
