@@ -1,15 +1,8 @@
-export const NotificationTypes = {
-  // e.g., A: "A",
-};
-
-export type NotificationType =
-  (typeof NotificationTypes)[keyof typeof NotificationTypes];
-
-export abstract class AbstractNotification {
-  public type: NotificationType;
+export abstract class AbstractNotification<T = string> {
+  public type: T;
   constructor(
     public uuid: string,
-    type: NotificationType,
+    type: T,
     public payload: Record<string, any>,
     public ownerUuid: string,
     public isRead: boolean,

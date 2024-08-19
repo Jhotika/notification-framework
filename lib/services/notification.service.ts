@@ -20,10 +20,6 @@ export type EnabledNotificationType = ReturnType<
   (typeof notificationFactoryMap)[keyof typeof notificationFactoryMap]
 >;
 
-export type EnabledNotificationResponseType = Awaited<
-  ReturnType<EnabledNotificationType["genResponse"]>
->;
-
 export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
 
@@ -126,7 +122,7 @@ export class NotificationService {
     await this.notificationRepository.genMarkAsReadX(uuid);
   };
 
-  genSave = async (notification: AbstractNotification): Promise<boolean> => {
+  genSave = async (notification: EnabledNotificationType): Promise<boolean> => {
     try {
       await this.notificationRepository.genCreateX(notification);
     } catch (error) {
