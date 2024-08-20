@@ -10,11 +10,13 @@ describe("InMemory", () => {
   const viewerId = "viewer__0001";
   const repository = new InMemoryUserNotificationMetadataRepository(viewerId);
   const notifRepository = new InMemoryNotificationRepository(viewerId);
+  const senderUuid = "sender__0001";
   const notification = new MockNotification(
     "1", // uuid
     "type",
     {},
     viewerId,
+    senderUuid,
     false,
     Date.now() - 200,
     "customValue"
@@ -26,6 +28,7 @@ describe("InMemory", () => {
       "type",
       {},
       viewerId,
+      senderUuid,
       false,
       Date.now() - 200,
       "random customValue"
@@ -38,6 +41,7 @@ describe("InMemory", () => {
       "type",
       {},
       "someone_elses_id",
+      senderUuid,
       false,
       Date.now(), // newer than newerNotif, but not for viewerId
       "foo"
