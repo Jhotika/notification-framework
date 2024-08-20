@@ -10,81 +10,45 @@ def generate_model_file(param, output_file):
   notif_name = param+"Notification"
 
   try:
-    template = template = f"""
+    template = f"""
+import {{
+  AbstractNotification,
+  INotification,
+}} from "../../lib/models/abstractNotification";
 
-import {{AbstractNotification, NotificationTypes}} from "./abstractNotification";
-import {{ v4 as uuidv4 }} from "uuid";
-import {{ User }} from "../../users/components/User";
-import {{ AbstractNotificationResponse }} from "./abstractNotificationResponse";
-import {{ logger }} from "../../../logger";
+interface I{notif_name} {{
+  notification: INotification;
+  // Add more fields here
+}}
 
 export class {notif_name} extends AbstractNotification {{
-  static notifType = NotificationTypes.{param};
   constructor(
-    public readonly uuid: string,
-    public readonly payload: Record<string, any>,
-    public readonly ownerUuid: string,
-    public readonly senderUuid: string,
-    public isRead: boolean,
-    public readonly createdAt: number,
-  ) {{
-    super(
-      uuid,
-      {notif_name}.notifType,
-      payload,
-      ownerUuid,
-      isRead,
-      createdAt
-    );
-  }}
-
-  static New = (
-    payload: Object,
+    uuid: string,
+    type: string,
+    payload: Record<string, any>,
     ownerUuid: string,
     senderUuid: string,
-  ): {notif_name} => {{
-    return new {notif_name}(
-      uuidv4(),
-      payload,
-      ownerUuid,
-      senderUuid,
-      false, // isRead
-      Date.now(),
-    );
-  }};
-
-  static fromRaw = (raw: Object): {notif_name} => {{
-    return new {notif_name}(
-      raw["uuid"],
-      raw["payload"],
-      raw["ownerUuid"],
-      raw["senderUuid"],
-      raw["isRead"] || false,
-      raw["createdAt"] || 0,
-    );
-  }};
-
-  genResponse =
-    async (): Promise<{notif_name}ResponseType | null> => {{
-      return new {notif_name}Response(this).genResponse();
-    }};
-}}
-
-export type {notif_name}ResponseType = {{
-  notification: {notif_name};
-  senderName: string;
-}};
-
-export class {notif_name}Response extends AbstractNotificationResponse {{
-  constructor(public notification: {notif_name}) {{
-    super(notification);
+    isRead: boolean,
+    createdAt: number,
+    public readonly customField: string
+  ) {{
+    super(uuid, type, payload, ownerUuid, senderUuid, isRead, createdAt);
   }}
 
-  genResponse =
-    async (): Promise<{notif_name}ResponseType | null> => {{
-      throw new Error("Method not implemented.");
+  genResponse = async (): Promise<I{notif_name}> => {{
+    return {{
+      notification: {{
+        uuid: this.uuid,
+        type: this.type,
+        payload: this.payload,
+        ownerUuid: this.ownerUuid,
+        isRead: this.isRead,
+        createdAt: this.createdAt,
+      }} as INotification,
     }};
+  }};
 }}
+
 """
     with open(output_file, 'w') as output:
       output.write(template)
