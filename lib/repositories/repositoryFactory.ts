@@ -9,6 +9,8 @@ import { IUserNotificationMetadataRepository } from "./IUserNotificationMetadata
 
 import { DatabaseNotSupportedError } from "../errors/databaseNotSupportedError";
 import { type IMongoCollectionConfig } from "../configs/db/mongoCollection.config";
+import { InMemoryNotificationRepository } from "./inMemory/inMemoryNotificationRepository";
+import { InMemoryUserNotificationMetadataRepository } from "./inMemory/inMemoryUserNotificationMetadataRepository";
 
 export class RepositoryFactory {
   /**
@@ -45,6 +47,12 @@ export class RepositoryFactory {
               config.notificationCollection,
               config.userNotificationMetadataCollection
             ),
+        };
+      case DatabaseType.InMemory:
+        return {
+          notificationRepository: new InMemoryNotificationRepository(viewerId),
+          userNotificationMetadataRepository:
+            new InMemoryUserNotificationMetadataRepository(viewerId),
         };
       default:
         throw new DatabaseNotSupportedError(
