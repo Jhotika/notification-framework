@@ -1,10 +1,10 @@
 import {
-  DatabaseConfig,
   verifyDatabaseConfig,
   DatabaseType,
-  MongoDbConfig,
-  MongoCollectionConfig,
-} from "../configs/database.config";
+  IDatabaseConfig,
+} from "./configs/db/database.config";
+import type { IMongoDbConfig } from "./configs/db/mongoDb.config";
+import type { IMongoCollectionConfig } from "./configs/db/mongoCollection.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
 import { RepositoryFactory } from "./repositories/repositoryFactory";
@@ -24,7 +24,7 @@ class NotificationFramework {
   constructor(
     private readonly viewerId: string,
     private readonly logger: ILogger = new Logger(),
-    dbConfig: DatabaseConfig
+    dbConfig: IDatabaseConfig
   ) {
     try {
       verifyDatabaseConfig(dbConfig);
@@ -54,7 +54,7 @@ class NotificationFramework {
   static withMongoCollections = (
     viewerId: string,
     logger: ILogger,
-    mongoCollections: MongoCollectionConfig
+    mongoCollections: IMongoCollectionConfig
   ): NotificationFramework => {
     return new NotificationFramework(viewerId, logger, {
       type: DatabaseType.MongoDocuments,
@@ -69,7 +69,7 @@ class NotificationFramework {
   static withMongoDb = (
     viewerId: string,
     logger: ILogger,
-    mongoConfig: MongoDbConfig
+    mongoConfig: IMongoDbConfig
   ): NotificationFramework => {
     return new NotificationFramework(viewerId, logger, {
       type: DatabaseType.MongoDB,
