@@ -1,25 +1,25 @@
-import { DatabaseConfig, DatabaseType } from "../../configs/database.config";
+import {
+  type IDatabaseConfig,
+  DatabaseType,
+} from "../configs/db/database.config";
 import { MongoNotificationRepository } from "./mongo/mongoNotificationRepository";
 import { MongoUserNotificationMetadataRepository } from "./mongo/mongoUserNotificationMetadataRepository";
 import { INotificationRepository } from "./INotificationRepository";
 import { IUserNotificationMetadataRepository } from "./IUserNotificationMetadataRepository";
 
 import { DatabaseNotSupportedError } from "../errors/databaseNotSupportedError";
-import { type MongoCollectionConfig } from "../../configs/database.config";
+import { type IMongoCollectionConfig } from "../configs/db/mongoCollection.config";
 
 export class RepositoryFactory {
   /**
-   * This method is used to get the repository based on the database type
-   * If the database type is not provided, it will use the ENABLED_DB_TYPE
-   * from the environment variables. If that is also not provided, it will
-   * throw an error.
+   * Factory method to get the notification repositories based on the enabled database type.
    * @param enabledDbType: DatabaseType
    * @returns An object containing the notification repositories.
    * @throws DatabaseNotSupportedError
    */
   static getRepositoryX = (
     viewerId: string,
-    dbConfig: DatabaseConfig
+    dbConfig: IDatabaseConfig
   ): {
     notificationRepository: INotificationRepository;
     userNotificationMetadataRepository: IUserNotificationMetadataRepository;
@@ -33,7 +33,7 @@ export class RepositoryFactory {
             new MongoUserNotificationMetadataRepository(viewerId),
         };
       case DatabaseType.MongoDocuments:
-        const config = dbConfig.config as MongoCollectionConfig;
+        const config = dbConfig.config as IMongoCollectionConfig;
         return {
           notificationRepository: new MongoNotificationRepository(
             viewerId,
