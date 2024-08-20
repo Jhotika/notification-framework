@@ -2,6 +2,7 @@ import { InMemoryNotificationRepository } from "../inMemoryNotificationRepositor
 
 import { describe, expect, it } from "@jest/globals";
 import { MockNotification } from "./MockNotification";
+
 describe("InMemoryNotificationRepository", () => {
   const viewerId = "viewer__0001";
   let notificationRepository: InMemoryNotificationRepository;
@@ -20,7 +21,6 @@ describe("InMemoryNotificationRepository", () => {
   });
 
   it("should create a notification", async () => {
-    const viewerId = "viewer__0001";
     await notificationRepository.genCreateX(notification);
     const fetchedNotification = await notificationRepository.genFetchX(
       notification.uuid
@@ -36,7 +36,6 @@ describe("InMemoryNotificationRepository", () => {
   });
 
   it("should mark a notification as read", async () => {
-    const viewerId = "viewer__0001";
     await notificationRepository.genMarkAsReadX(notification.uuid);
     const fetchedNotification = await notificationRepository.genFetchX(
       notification.uuid
@@ -52,7 +51,7 @@ describe("InMemoryNotificationRepository", () => {
       viewerId,
       false,
       Date.now(),
-      "customValue"
+      "random customValue"
     );
     const notificationAnotherUser = new MockNotification(
       "rand_uuid_user_2", // some random uuid
@@ -61,7 +60,7 @@ describe("InMemoryNotificationRepository", () => {
       "random_user_id",
       false,
       Date.now(),
-      "customValue"
+      "some other value"
     );
     const anotherNotificationRepository = new InMemoryNotificationRepository(
       "random_user_id"
@@ -81,7 +80,7 @@ describe("InMemoryNotificationRepository", () => {
       viewerId,
       false,
       Date.now(),
-      "customValue"
+      "bar"
     );
     await notificationRepository.genCreateX(notification3);
     await notificationRepository.genMarkAllAsReadX();
