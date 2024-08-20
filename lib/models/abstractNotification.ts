@@ -1,3 +1,16 @@
+export interface INotification {
+  uuid: string;
+  type: string;
+  payload: Record<string, any>;
+  ownerUuid: string;
+  isRead: boolean;
+  createdAt: number;
+}
+
+export interface INotificationResponse {
+  notification: INotification & Record<string, any>;
+}
+
 export abstract class AbstractNotification<T = string> {
   public type: T;
   constructor(
@@ -11,5 +24,9 @@ export abstract class AbstractNotification<T = string> {
     this.type = type;
   }
 
-  abstract genResponse(): Promise<any>;
+  abstract genResponse(): Promise<
+    {
+      notification: INotification;
+    } & Record<string, any>
+  >;
 }

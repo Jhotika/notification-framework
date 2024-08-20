@@ -1,5 +1,8 @@
 import type { ILogger } from "../logger";
-import { AbstractNotification } from "../models/abstractNotification";
+import {
+  AbstractNotification,
+  INotificationResponse,
+} from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
@@ -45,9 +48,10 @@ export class NotificationService {
     }
   };
 
-  static genFetchX = async (uuid: string): Promise<AbstractNotification> => {
-    // Fetch a notification by its uuid.
-    throw new Error("Not implemented");
+  genFetchX = async (uuid: string): Promise<AbstractNotification | null> => {
+    return (await this.genFetchNotificationX(
+      uuid
+    )) as AbstractNotification | null;
   };
 
   private genFetchAllForUserX = async (): Promise<AbstractNotification[]> => {
@@ -62,7 +66,7 @@ export class NotificationService {
     ).filter((notif) => notif != null) as AbstractNotification[];
   };
 
-  genFetchAllResponseForUserX = async (): Promise<AbstractNotification[]> => {
+  genFetchAllResponseForUserX = async (): Promise<INotificationResponse[]> => {
     const notifications = await this.genFetchAllForUserX();
     return (
       await Promise.all(
@@ -70,7 +74,7 @@ export class NotificationService {
           notification ? notification.genResponse() : null
         )
       )
-    ).filter((notif) => notif != null) as AbstractNotification[];
+    ).filter((notif) => notif != null) as INotificationResponse[];
   };
 
   genMarkAllAsReadX = async (): Promise<void> => {

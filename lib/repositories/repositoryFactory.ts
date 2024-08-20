@@ -46,6 +46,10 @@ export class RepositoryFactory {
               config.userNotificationMetadataCollection
             ),
         };
+      case DatabaseType.InMemory:
+        throw new DatabaseNotSupportedError(
+          "In-memory database is not supported"
+        );
       default:
         throw new DatabaseNotSupportedError(
           `Database type ${dbType} is not supported`
