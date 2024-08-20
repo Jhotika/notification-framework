@@ -1,10 +1,10 @@
-// unit test for ../inMemoryNotificationRepository.ts
 import { InMemoryNotificationRepository } from "../inMemoryNotificationRepository";
 
 import { describe, expect, it } from "@jest/globals";
 import { MockNotification } from "./MockNotification";
 describe("InMemoryNotificationRepository", () => {
   const viewerId = "viewer__0001";
+  let notificationRepository: InMemoryNotificationRepository;
   const notification = new MockNotification(
     "1", // uuid
     "type",
@@ -15,9 +15,12 @@ describe("InMemoryNotificationRepository", () => {
     "customValue"
   );
 
+  beforeEach(() => {
+    notificationRepository = new InMemoryNotificationRepository(viewerId);
+  });
+
   it("should create a notification", async () => {
     const viewerId = "viewer__0001";
-    const notificationRepository = new InMemoryNotificationRepository(viewerId);
     await notificationRepository.genCreateX(notification);
     const fetchedNotification = await notificationRepository.genFetchX(
       notification.uuid
@@ -26,7 +29,6 @@ describe("InMemoryNotificationRepository", () => {
   });
 
   it("should fetch a notification", async () => {
-    const notificationRepository = new InMemoryNotificationRepository(viewerId);
     const fetchedNotification = await notificationRepository.genFetchX(
       notification.uuid
     );
@@ -35,7 +37,6 @@ describe("InMemoryNotificationRepository", () => {
 
   it("should mark a notification as read", async () => {
     const viewerId = "viewer__0001";
-    const notificationRepository = new InMemoryNotificationRepository(viewerId);
     await notificationRepository.genMarkAsReadX(notification.uuid);
     const fetchedNotification = await notificationRepository.genFetchX(
       notification.uuid
@@ -44,7 +45,6 @@ describe("InMemoryNotificationRepository", () => {
   });
 
   it("should fetch all notifications for a user", async () => {
-    const notificationRepository = new InMemoryNotificationRepository(viewerId);
     const notification2 = new MockNotification(
       "2", // different uuid
       "type",
@@ -71,7 +71,6 @@ describe("InMemoryNotificationRepository", () => {
     const notifications =
       await notificationRepository.genFetchAllRawForViewerX();
     expect(notifications).toEqual([notification, notification2]);
-    expect;
   });
 
   it("should mark all notifications as read", async () => {
@@ -84,7 +83,6 @@ describe("InMemoryNotificationRepository", () => {
       Date.now(),
       "customValue"
     );
-    const notificationRepository = new InMemoryNotificationRepository(viewerId);
     await notificationRepository.genCreateX(notification3);
     await notificationRepository.genMarkAllAsReadX();
     const allNotifs = await notificationRepository.genFetchAllRawForViewerX();
