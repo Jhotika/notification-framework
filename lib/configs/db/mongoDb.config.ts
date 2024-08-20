@@ -1,3 +1,5 @@
+import { AbstractDbConfig } from "./abstractDb.config";
+
 export interface IMongoDbConfig {
   user: string;
   password: string;
@@ -8,9 +10,7 @@ export interface IMongoDbConfig {
 export const dbType = "mongodb";
 
 export class MongoDbConfig extends AbstractDbConfig {
-  constructor(
-    public readonly dbType: string,
-  ) {
+  constructor(public readonly dbType: string) {
     super();
   }
 

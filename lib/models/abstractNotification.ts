@@ -24,9 +24,5 @@ export abstract class AbstractNotification<T = string> {
     this.type = type;
   }
 
-  abstract genResponse(): Promise<
-    {
-      notification: INotification;
-    } & Record<string, any>
-  >;
+  abstract genResponse(): Promise<INotificationResponse | null>;
 }

@@ -1,3 +1,5 @@
+import { AbstractDbConfig } from "./abstractDb.config";
+
 export interface IInMemoryConfig {
   // No configuration required
 }
