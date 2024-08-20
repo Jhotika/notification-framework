@@ -2,7 +2,7 @@ import sys
 
 import service_gen
 import model_gen
-import scripts.gen_update_enum as gen_update_enum
+import gen_update_enum as gen_update_enum
 
 
 if __name__ == "__main__":
@@ -14,7 +14,7 @@ if __name__ == "__main__":
   model_js_file_path = sys.argv[2]
   service_js_file_path = sys.argv[3]
 
-  if gen_update_enum.update_notif_types(notif_type_name):
+  if gen_update_enum.update_enum(notif_type_name):
     try:
       model_gen.generate_model_file(notif_type_name, model_js_file_path)
 

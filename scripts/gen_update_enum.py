@@ -17,6 +17,7 @@ def update_enum(param):
     if not os.path.exists(js_file):
       with open(js_file, 'w') as f:
         f.write(f"export enum {enum_name} {{\n}}")
+
     with open(js_file, 'r') as f:
       content = f.read()
 
@@ -24,7 +25,6 @@ def update_enum(param):
     enum_pattern = rf"(?:export\s+)?enum\s+{enum_name}\s+{{(.*?)}}"
 
     match = re.search(enum_pattern, content, re.DOTALL)  # Allow matching across newlines
-    print(match, content, enum_pattern)
 
     if not match:
       raise ValueError(f"Enum '{enum_name}' not found in {js_file}")
