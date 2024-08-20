@@ -1,5 +1,5 @@
 import { Collection } from "mongodb";
-import { AbstractNotification } from "../lib/models/abstractNotification";
+import { AbstractNotification } from "../models/abstractNotification";
 
 // Enum representing the supported database types.
 export enum DatabaseType {
@@ -30,6 +30,12 @@ export const verifyDatabaseConfig = (
 ): void => {
   if (!dbConfig) {
     throw new Error("Missing database configuration");
+  }
+  if (!dbConfig.type) {
+    throw new Error("Missing database type");
+  }
+  if (dbConfig.type === DatabaseType.InMemory) {
+    return;
   }
 
   if (dbConfig.type === DatabaseType.MongoDB) {
