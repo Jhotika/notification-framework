@@ -14,11 +14,12 @@ export class MockNotification extends AbstractNotification {
     type: string,
     payload: Record<string, any>,
     ownerUuid: string,
+    senderUuid: string,
     isRead: boolean,
     createdAt: number,
     public readonly customField: string
   ) {
-    super(uuid, type, payload, ownerUuid, isRead, createdAt);
+    super(uuid, type, payload, ownerUuid, senderUuid, isRead, createdAt);
   }
 
   genResponse = async (): Promise<IMockNotification> => {

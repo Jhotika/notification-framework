@@ -6,11 +6,13 @@ import { MockNotification } from "./MockNotification";
 describe("InMemoryNotificationRepository", () => {
   const viewerId = "viewer__0001";
   let notificationRepository: InMemoryNotificationRepository;
+  const senderUuid = "sender__0001";
   const notification = new MockNotification(
     "1", // uuid
     "type",
     {},
     viewerId,
+    senderUuid,
     false,
     Date.now(),
     "customValue"
@@ -49,6 +51,7 @@ describe("InMemoryNotificationRepository", () => {
       "type",
       {},
       viewerId,
+      senderUuid,
       false,
       Date.now(),
       "random customValue"
@@ -58,6 +61,7 @@ describe("InMemoryNotificationRepository", () => {
       "type",
       {},
       "random_user_id",
+      senderUuid,
       false,
       Date.now(),
       "some other value"
@@ -78,6 +82,7 @@ describe("InMemoryNotificationRepository", () => {
       "type",
       {},
       viewerId,
+      senderUuid,
       false,
       Date.now(),
       "bar"
