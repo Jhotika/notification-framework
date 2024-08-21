@@ -23,10 +23,10 @@ export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
 
   constructor(
-    private readonly viewerUserId: string,
-    private readonly notificationRepository: INotificationRepository,
-    private readonly userNotificationMetadataRepository: IUserNotificationMetadataRepository,
-    private readonly logger: ILogger
+    public readonly viewerUserId: string,
+    public readonly notificationRepository: INotificationRepository,
+    public readonly userNotificationMetadataRepository: IUserNotificationMetadataRepository,
+    public readonly logger: ILogger
   ) {
     this.userNotificationMetadataService = new UserNotificationMetadataService(
       viewerUserId,
