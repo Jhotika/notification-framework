@@ -11,7 +11,12 @@ import { RepositoryFactory } from "./repositories/repositoryFactory";
 import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
-class NotificationFramework {
+interface INotificationFramework {
+  notificationService: NotificationService;
+  userNotificationMetadataService: UserNotificationMetadataService;
+}
+
+export class NotificationFramework implements INotificationFramework {
   public notificationService: NotificationService;
   public userNotificationMetadataService: UserNotificationMetadataService;
 

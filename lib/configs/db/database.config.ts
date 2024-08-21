@@ -23,7 +23,7 @@ export enum DatabaseType {
 
 export interface IDatabaseConfig {
   type: DatabaseType;
-  config: IMongoDbConfig | IMongoCollectionConfig | null;
+  config: IMongoDbConfig | IMongoCollectionConfig | IInMemoryConfig | null;
 }
 
 export const verifyDatabaseConfig = (
