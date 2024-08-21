@@ -10,4 +10,7 @@ export interface INotificationRepository {
   genMarkAllAsReadX(): Promise<void>;
   // genMarkAsReadX is a method that marks a notification specified by the uid as read
   genMarkAsReadX(uid: string): Promise<void>;
+
+  // genDeleteX is a method that deletes a notification specified by the uid
+  genDeleteX(uid: string): Promise<void>;
 }

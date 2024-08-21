@@ -40,4 +40,8 @@ export class MongoNotificationRepository
       })
       .toArray();
   };
+
+  genDeleteX = async (uid: string): Promise<void> => {
+    await this.collection.deleteOne({ uuid: uid });
+  };
 }
