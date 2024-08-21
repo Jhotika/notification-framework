@@ -52,6 +52,6 @@ export class NotificationFrameworkBuilder {
       throw new Error("dbConfig is required");
     }
 
-    return NotificationFramework.getInstanceX(this.logger, this.dbConfig);
+    return NotificationFramework.getInstanceX(this.dbConfig, this.logger);
   }
 }

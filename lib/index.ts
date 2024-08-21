@@ -3,8 +3,6 @@ import {
   DatabaseType,
   IDatabaseConfig,
 } from "./configs/db/database.config";
-import type { IMongoDbConfig } from "./configs/db/mongoDb.config";
-import type { IMongoCollectionConfig } from "./configs/db/mongoCollection.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
 import {
@@ -29,15 +27,15 @@ export interface INotificationFramework {
 export class NotificationFramework implements INotificationFramework {
   /**
    * Constructs a new instance of NotificationFramework.
-   * @param logger - The logger instance.
    * @param dbConfig - The database configuration.
+   * @param logger - The logger instance.
    */
 
   private static instance: NotificationFramework | null = null;
 
   private constructor(
-    private readonly logger: ILogger = new Logger(),
-    private readonly dbConfig: IDatabaseConfig
+    private readonly dbConfig: IDatabaseConfig,
+    private readonly logger: ILogger = new Logger()
   ) {
     try {
       verifyDatabaseConfig(dbConfig);
@@ -48,11 +46,11 @@ export class NotificationFramework implements INotificationFramework {
   }
 
   static getInstanceX = (
-    logger: ILogger,
-    dbConfig: IDatabaseConfig
+    dbConfig: IDatabaseConfig,
+    logger: ILogger
   ): NotificationFramework => {
     if (!this.instance) {
-      this.instance = new NotificationFramework(logger, dbConfig);
+      this.instance = new NotificationFramework(dbConfig, logger);
     } else {
       if (this.instance.dbConfig !== dbConfig) {
         throw new Error(
@@ -64,30 +62,6 @@ export class NotificationFramework implements INotificationFramework {
       }
     }
     return this.instance;
-  };
-
-  static withMongoCollections = (
-    logger: ILogger,
-    mongoCollections: IMongoCollectionConfig
-  ): NotificationFramework => {
-    return NotificationFramework.getInstanceX(logger, {
-      type: DatabaseType.MongoDocuments,
-      config: {
-        notificationCollection: mongoCollections.notificationCollection,
-        userNotificationMetadataCollection:
-          mongoCollections.userNotificationMetadataCollection,
-      },
-    });
-  };
-
-  static withMongoDb = (
-    logger: ILogger,
-    mongoConfig: IMongoDbConfig
-  ): NotificationFramework => {
-    return NotificationFramework.getInstanceX(logger, {
-      type: DatabaseType.MongoDB,
-      config: mongoConfig,
-    });
   };
 
   /**
