@@ -76,8 +76,8 @@ Our journey to version 1.0.0 includes:
 To use the `NotificationFramework`, initialize it with a logger (optional) and a database configuration.
 
 ```typescript
-import NotificationFramework from "notification-framework";
-import { DatabaseType } from "notification-framework/configs/db/database.config";
+import NotificationFramework from "notification-framework/lib";
+import { DatabaseType } from "notification-framework/lib/configs/db/database.config";
 import { Logger } from "path/to/your/logger"; // Example logger
 
 const dbConfig = {
@@ -86,6 +86,7 @@ const dbConfig = {
     // MongoDB configuration here
   },
 };
+// optional logger
 const logger = new Logger();
 
 const framework = NotificationFramework.getInstanceX(dbConfig, logger);
@@ -101,7 +102,7 @@ const userMetadataService =
 You can also use the `NotificationFrameworkBuilder` to configure and create the framework instance.
 
 ```typescript
-import { NotificationFrameworkBuilder } from "notification-framework";
+import { NotificationFrameworkBuilder } from "notification-framework/lib";
 import { Logger } from "path/to/your/logger"; // Example logger
 
 const builder = new NotificationFrameworkBuilder()
@@ -125,7 +126,7 @@ const userMetadataService =
 To configure the framework with MongoDB, provide the MongoDB configuration object:
 
 ```typescript
-import { IMongoDbConfig } from "notification-framework/configs/db/mongoDb.config";
+import { IMongoDbConfig } from "notification-framework/lib/configs/db/mongoDb.config";
 
 const mongoDbConfig: IMongoDbConfig = {
   // MongoDB configuration options
@@ -137,7 +138,7 @@ const mongoDbConfig: IMongoDbConfig = {
 To configure the framework with Mongo collections:
 
 ```typescript
-import { IMongoCollectionConfig } from "notification-framework/configs/db/mongoCollection.config";
+import { IMongoCollectionConfig } from "notification-framework/lib/configs/db/mongoCollection.config";
 
 const mongoCollectionsConfig: IMongoCollectionConfig = {
   notificationCollection: your-mongo-collection-for-notifications,
@@ -150,7 +151,7 @@ const mongoCollectionsConfig: IMongoCollectionConfig = {
 For in-memory database configuration:
 
 ```typescript
-import { IInMemoryConfig } from "notification-framework/configs/db/inMemory.config";
+import { IInMemoryConfig } from "notification-framework/lib/configs/db/inMemory.config";
 
 const inMemoryConfig: IInMemoryConfig = {};
 ```
