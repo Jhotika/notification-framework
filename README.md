@@ -6,6 +6,7 @@ This Framework provides a convenient interface and essential features for managi
 
 - [Notification Framework](#notification-framework)
   - [Table of Contents](#table-of-contents)
+  - [Roadmap](#roadmap)
   - [Features](#features)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -19,6 +20,27 @@ This Framework provides a convenient interface and essential features for managi
   - [Contributing](#contributing)
   - [Code Guidelines](#code-guidelines)
   - [License](#license)
+
+## Roadmap
+
+Our journey to version 1.0.0 includes:
+
+1. **Testing**:
+
+   - Expand unit tests coverage.
+   - Add integration tests by integrating the framework into a Node.js project to demonstrate its functionality.
+
+2. **Documentation**:
+
+   - Improve and expand documentation.
+   - Include detailed examples and usage scenarios.
+
+3. **More Examples**:
+
+   - Provide additional examples showcasing different configurations and use cases.
+
+4. **Community Feedback**:
+   - Gather feedback from early adopters to refine features and fix bugs.
 
 ## Features
 
