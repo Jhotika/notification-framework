@@ -1,6 +1,6 @@
 # Notification Framework
 
-This Framework provides a convenient interface and some features for managing notifications within your application.
+This Framework provides a convenient interface and essential features for managing notifications within your application.
 
 ## Table of Contents
 
@@ -15,46 +15,48 @@ This Framework provides a convenient interface and some features for managing no
     - [MongoDB](#mongodb)
     - [Mongo Collections](#mongo-collections)
     - [In-Memory Database](#in-memory-database)
+- [For Developers](#for-developers)
   - [Contributing](#contributing)
+  - [Code Guidelines](#code-guidelines)
   - [License](#license)
 
 ## Features
 
-- Interfaces to manage notifications and user-notifications features.
+- Interfaces for managing notifications and user-notification features.
 - Singleton pattern to ensure a single instance with consistent configuration.
-- Supports multiple database configurations, including MongoDB, Mongo collections, and in-memory databases (more to come)
+- Supports multiple database configurations, including MongoDB, Mongo collections, and in-memory databases (more options to come).
 - Provides access to `NotificationService` and `UserNotificationMetadataService` for managing notifications and metadata.
 
 ## Installation
 
-1. Clone the git repo
+1. Clone the Git repository:
 
-```bash
-git clone https://github.com/Jhotika/notification-framework
-```
+   ```bash
+   git clone https://github.com/Jhotika/notification-framework
+   ```
 
-2. Install the dependencies using npm,
+2. Install the dependencies using npm:
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-or yarn
+   or yarn:
 
-```bash
-yarn add
-```
+   ```bash
+   yarn install
+   ```
 
 ## Usage
 
 ### Basic Usage
 
-To use the `NotificationFramework`, you need to initialize it with a logger (optional) and a database configuration.
+To use the `NotificationFramework`, initialize it with a logger (optional) and a database configuration.
 
 ```typescript
-import NotificationFramework from "notification-framework/lib";
+import NotificationFramework from "notification-framework";
 import { DatabaseType } from "notification-framework/configs/db/database.config";
-import { Logger } from "path/to/your/logger"; // example logger
+import { Logger } from "path/to/your/logger"; // Example logger
 
 const dbConfig = {
   type: DatabaseType.MongoDB,
@@ -78,12 +80,13 @@ You can also use the `NotificationFrameworkBuilder` to configure and create the 
 
 ```typescript
 import { NotificationFrameworkBuilder } from "notification-framework";
+import { Logger } from "path/to/your/logger"; // Example logger
 
 const builder = new NotificationFrameworkBuilder()
-  .withLogger(new Logger())
   .withMongoDbConfig({
     // MongoDB configuration here
   });
+  .withLogger(new Logger()) // optional
 
 const framework = builder.buildX();
 
@@ -115,10 +118,8 @@ To configure the framework with Mongo collections:
 import { IMongoCollectionConfig } from "notification-framework/configs/db/mongoCollection.config";
 
 const mongoCollectionsConfig: IMongoCollectionConfig = {
-  notificationCollection:
-    your - mongo - collection - to - store - the - notifications,
-  userNotificationMetadataCollection:
-    your - mongo - collection - to - store - the - notification - metadata,
+  notificationCollection: your-mongo-collection-for-notifications,
+  userNotificationMetadataCollection: your-mongo-collection-for-metadata,
 };
 ```
 
@@ -132,6 +133,8 @@ import { IInMemoryConfig } from "notification-framework/configs/db/inMemory.conf
 const inMemoryConfig: IInMemoryConfig = {};
 ```
 
+# For Developers
+
 ## Contributing
 
 We welcome contributions to the Notification Framework. To contribute:
@@ -140,7 +143,18 @@ We welcome contributions to the Notification Framework. To contribute:
 2. Create a new branch for your feature or bug fix.
 3. Commit your changes and push the branch.
 4. Open a pull request describing your changes.
-5. Join our Facebook group! - https://www.facebook.com/groups/1569662676946579
+5. Join our Facebook group! - [Facebook Group](https://www.facebook.com/groups/1569662676946579)
+
+## Code Guidelines
+
+To maintain code quality and consistency, please follow these guidelines:
+
+1. Method naming:
+   1. Async methods are prefixed with `gen`. e.g., `genResponse`
+   2. Methods that might throw are suffixed with `X`, e.g., `buildX` or `genMarkAsReadX`
+2. Keep external dependencies as low as possible
+3. No offsite write! We delegate offsite writes to the Framework users.
+4. Testing: Write unit tests for new features and bug fixes. Ensure all tests pass before submitting a pull request.
 
 ## License
 
