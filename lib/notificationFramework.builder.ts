@@ -6,14 +6,8 @@ import { IMongoDbConfig } from "./configs/db/mongoDb.config";
 import { ILogger, Logger } from "./logger";
 
 export class NotificationFrameworkBuilder {
-  private viewerId: string;
   private logger: ILogger;
   private dbConfig: IDatabaseConfig;
-
-  public withViewerId(viewerId: string): NotificationFrameworkBuilder {
-    this.viewerId = viewerId;
-    return this;
-  }
 
   public withLogger(logger: ILogger): NotificationFrameworkBuilder {
     this.logger = logger;
@@ -51,9 +45,6 @@ export class NotificationFrameworkBuilder {
   }
 
   public build(): NotificationFramework {
-    if (!this.viewerId) {
-      throw new Error("viewerId is required");
-    }
     if (!this.logger) {
       this.logger = new Logger();
     }
@@ -61,6 +52,6 @@ export class NotificationFrameworkBuilder {
       throw new Error("dbConfig is required");
     }
 
-    return new NotificationFramework(this.viewerId, this.logger, this.dbConfig);
+    return new NotificationFramework(this.logger, this.dbConfig);
   }
 }

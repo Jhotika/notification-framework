@@ -15,7 +15,6 @@ import { AbstractNotification } from "../../lib/models/abstractNotification";
  **/
 export const nfWithMongoDb = (): INotificationFramework => {
   const framework = new NotificationFrameworkBuilder()
-    .withViewerId("123")
     .withLogger(new Logger())
     .withMongoDbConfig({
       clusterUri: "mongodb://localhost:27017",
@@ -36,7 +35,6 @@ export const nfWithMongoCollections = (
   userNotificationMetadataCollection: Collection
 ): INotificationFramework => {
   const framework = new NotificationFrameworkBuilder()
-    .withViewerId("123")
     .withLogger(new Logger())
     .withMongoCollectionConfig({
       notificationCollection,
@@ -52,7 +50,6 @@ export const nfWithMongoCollections = (
  **/
 export const nfWithInMemory = (): INotificationFramework => {
   const framework = new NotificationFrameworkBuilder()
-    .withViewerId("123")
     .withLogger(new Logger())
     .withInMemoryDbConfig({})
     .build();
