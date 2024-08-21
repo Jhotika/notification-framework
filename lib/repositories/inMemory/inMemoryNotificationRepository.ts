@@ -45,4 +45,8 @@ export class InMemoryNotificationRepository
       (notification) => notification.ownerUuid === this.viewerId
     );
   };
+
+  genDeleteX = async (uid: string): Promise<void> => {
+    notificationsMap.delete(uid);
+  };
 }
