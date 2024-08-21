@@ -83,7 +83,7 @@ export class NotificationFramework implements INotificationFramework {
         this.logger
       );
     } catch (error) {
-      this.logger.error("Error initializing NotificationFramework:", error);
+      this.logger.error("Error fetching NotificationService:", error);
       throw error; // Re-throw
     }
   };
@@ -106,7 +106,10 @@ export class NotificationFramework implements INotificationFramework {
         this.logger
       );
     } catch (error) {
-      this.logger.error("Error initializing NotificationFramework:", error);
+      this.logger.error(
+        "Error fetching UserNotificationMetadataService:",
+        error
+      );
       throw error; // Re-throw
     }
   };
