@@ -1,11 +1,11 @@
 export interface INotification<T = string> {
   uuid: string;
   type: T;
-  payload: Record<string, any>;
   ownerUuid: string;
   senderUuid: string;
   isRead: boolean;
   createdAt: number;
+  payload: Record<string, any>;
 }
 
 export interface INotificationResponse {
@@ -18,10 +18,10 @@ export abstract class AbstractNotification<T = string>
   constructor(
     public uuid: string,
     public type: T,
-    public payload: Record<string, any>,
     public ownerUuid: string,
     public senderUuid: string,
     public isRead: boolean,
+    public payload: Record<string, any>,
     public createdAt: number // Unix timestamp in milliseconds
   ) {}
 
