@@ -1,6 +1,6 @@
 {
   "name": "notif-framework",
-  "version": "0.0.1",
+  "version": "0.8.0",
   "description": "<!-- README file for this project -->",
   "main": "index.js",
   "scripts": {
