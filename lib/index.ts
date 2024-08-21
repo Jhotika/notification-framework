@@ -41,7 +41,6 @@ export class NotificationFramework implements INotificationFramework {
   }
 
   static withMongoCollections = (
-    viewerId: string,
     logger: ILogger,
     mongoCollections: IMongoCollectionConfig
   ): NotificationFramework => {
@@ -56,7 +55,6 @@ export class NotificationFramework implements INotificationFramework {
   };
 
   static withMongoDb = (
-    viewerId: string,
     logger: ILogger,
     mongoConfig: IMongoDbConfig
   ): NotificationFramework => {
