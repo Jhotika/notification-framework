@@ -22,7 +22,7 @@ export const nfWithMongoDb = (): INotificationFramework => {
       user: "admin",
       password: "password",
     })
-    .build();
+    .buildX();
   return framework;
 };
 
@@ -40,7 +40,7 @@ export const nfWithMongoCollections = (
       notificationCollection,
       userNotificationMetadataCollection,
     })
-    .build();
+    .buildX();
   return framework;
 };
 
@@ -52,6 +52,6 @@ export const nfWithInMemory = (): INotificationFramework => {
   const framework = new NotificationFrameworkBuilder()
     .withLogger(new Logger())
     .withInMemoryDbConfig({})
-    .build();
+    .buildX();
   return framework;
 };
