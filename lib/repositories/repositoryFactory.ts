@@ -12,6 +12,11 @@ import { type IMongoCollectionConfig } from "../configs/db/mongoCollection.confi
 import { InMemoryNotificationRepository } from "./inMemory/inMemoryNotificationRepository";
 import { InMemoryUserNotificationMetadataRepository } from "./inMemory/inMemoryUserNotificationMetadataRepository";
 
+export interface IRepository {
+  notificationRepository: INotificationRepository;
+  userNotificationMetadataRepository: IUserNotificationMetadataRepository;
+}
+
 export class RepositoryFactory {
   /**
    * Factory method to get the notification repositories based on the enabled database type.
@@ -22,10 +27,7 @@ export class RepositoryFactory {
   static getRepositoryX = (
     viewerId: string,
     dbConfig: IDatabaseConfig
-  ): {
-    notificationRepository: INotificationRepository;
-    userNotificationMetadataRepository: IUserNotificationMetadataRepository;
-  } => {
+  ): IRepository => {
     const dbType: string = dbConfig.type ?? process.env.ENABLED_DB_TYPE ?? "";
     switch (dbType) {
       case DatabaseType.MongoDB:

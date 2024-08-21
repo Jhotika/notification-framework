@@ -7,49 +7,33 @@ import type { IMongoDbConfig } from "./configs/db/mongoDb.config";
 import type { IMongoCollectionConfig } from "./configs/db/mongoCollection.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
-import { RepositoryFactory } from "./repositories/repositoryFactory";
+import {
+  IRepository,
+  RepositoryFactory,
+} from "./repositories/repositoryFactory";
 import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
 export interface INotificationFramework {
-  notificationService: NotificationService;
-  userNotificationMetadataService: UserNotificationMetadataService;
+  getNotificationServiceX: (viewerId: string) => NotificationService;
+  getUserNotificationMetadataServiceX: (
+    viewerId: string
+  ) => UserNotificationMetadataService;
 }
 
 export class NotificationFramework implements INotificationFramework {
-  public notificationService: NotificationService;
-  public userNotificationMetadataService: UserNotificationMetadataService;
-
   /**
    * Constructs a new instance of NotificationFramework.
-   * @param viewerId - The ID of the viewer.
    * @param logger - The logger instance.
    * @param dbConfig - The database configuration.
    */
+
   constructor(
-    private readonly viewerId: string,
     private readonly logger: ILogger = new Logger(),
-    dbConfig: IDatabaseConfig
+    private readonly dbConfig: IDatabaseConfig
   ) {
     try {
       verifyDatabaseConfig(dbConfig);
-      const repository = RepositoryFactory.getRepositoryX(
-        this.viewerId,
-        dbConfig
-      );
-      this.notificationService = new NotificationService(
-        this.viewerId,
-        repository.notificationRepository,
-        repository.userNotificationMetadataRepository,
-        this.logger
-      );
-
-      this.userNotificationMetadataService =
-        new UserNotificationMetadataService(
-          this.viewerId,
-          repository.userNotificationMetadataRepository,
-          this.logger
-        );
     } catch (error) {
       this.logger.error("Error initializing NotificationFramework:", error);
       throw error; // Re-throw
@@ -61,7 +45,7 @@ export class NotificationFramework implements INotificationFramework {
     logger: ILogger,
     mongoCollections: IMongoCollectionConfig
   ): NotificationFramework => {
-    return new NotificationFramework(viewerId, logger, {
+    return new NotificationFramework(logger, {
       type: DatabaseType.MongoDocuments,
       config: {
         notificationCollection: mongoCollections.notificationCollection,
@@ -76,7 +60,7 @@ export class NotificationFramework implements INotificationFramework {
     logger: ILogger,
     mongoConfig: IMongoDbConfig
   ): NotificationFramework => {
-    return new NotificationFramework(viewerId, logger, {
+    return new NotificationFramework(logger, {
       type: DatabaseType.MongoDB,
       config: mongoConfig,
     });
@@ -86,16 +70,45 @@ export class NotificationFramework implements INotificationFramework {
    * Gets the NotificationService instance.
    * @returns A NotificationService instance.
    */
-  getNotificationService = (): NotificationService => {
-    return this.notificationService;
+  getNotificationServiceX = (viewerId: string): NotificationService => {
+    try {
+      const repository: IRepository = RepositoryFactory.getRepositoryX(
+        viewerId,
+        this.dbConfig
+      );
+      return new NotificationService(
+        viewerId,
+        repository.notificationRepository,
+        repository.userNotificationMetadataRepository,
+        this.logger
+      );
+    } catch (error) {
+      this.logger.error("Error initializing NotificationFramework:", error);
+      throw error; // Re-throw
+    }
   };
 
   /**
    * Gets the UserNotificationMetadataService instance.
    * @returns A UserNotificationMetadataService instance.
    */
-  getUserNotificationMetadataService = (): UserNotificationMetadataService => {
-    return this.userNotificationMetadataService;
+  getUserNotificationMetadataServiceX = (
+    viewerId: string
+  ): UserNotificationMetadataService => {
+    try {
+      const repository: IRepository = RepositoryFactory.getRepositoryX(
+        viewerId,
+        this.dbConfig
+      );
+      return new UserNotificationMetadataService(
+        viewerId,
+        repository.userNotificationMetadataRepository,
+        this.logger
+      );
+    } catch (error) {
+      this.logger.error("Error initializing NotificationFramework:", error);
+      throw error; // Re-throw
+    }
   };
 }
 
