@@ -1,7 +1,7 @@
 #!/bin/bash
 
 python_script="generate_notif.py"  # Replace with the actual path to your Python script
-output_path="../src/models"
+output_path="../src/models/"
 service_output_path="../src/services/"
 
 if [ $# -ne 1 ]; then

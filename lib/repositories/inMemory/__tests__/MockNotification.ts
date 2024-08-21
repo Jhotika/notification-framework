@@ -19,7 +19,7 @@ export class MockNotification extends AbstractNotification {
     createdAt: number,
     public readonly customField: string
   ) {
-    super(uuid, type, payload, ownerUuid, senderUuid, isRead, createdAt);
+    super(uuid, type, ownerUuid, senderUuid, isRead, payload, createdAt);
   }
 
   genResponse = async (): Promise<IMockNotification> => {

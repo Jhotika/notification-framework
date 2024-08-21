@@ -1,6 +1,7 @@
+import os
 import re
 
-def update_notif_types(param):
+def update_enum(param):
   """
   Adds a new member to an existing enum in a JS file.
 
@@ -9,15 +10,19 @@ def update_notif_types(param):
     enum_name: The name of the enum.
     js_file: The path to the JS file.
   """
-  js_file = "../src/models/abstractNotification.ts"
-  enum_name = "NotificationTypes"
+  js_file = "../src/notificationTypes.ts"
+  enum_name = "NotificationType"
 
   try:
+    if not os.path.exists(js_file):
+      with open(js_file, 'w') as f:
+        f.write(f"export enum {enum_name} {{\n}}")
+
     with open(js_file, 'r') as f:
       content = f.read()
 
     # Improved regular expression pattern (may need further refinement)
-    enum_pattern = rf"(?:export\s+)?const\s+{enum_name}\s+=\s+{{(.*?)}}"
+    enum_pattern = rf"(?:export\s+)?enum\s+{enum_name}\s+{{(.*?)}}"
 
     match = re.search(enum_pattern, content, re.DOTALL)  # Allow matching across newlines
 
@@ -31,11 +36,11 @@ def update_notif_types(param):
       return
 
     # Append the new member before the closing brace
-    new_member = f"  {param}: \"{param}\","
+    new_member = f"  {param} = \"{param}\","
     new_enum_body = f"{enum_body}{new_member}\n"
 
     # Replace the old enum with the new one
-    new_content = re.sub(enum_pattern, rf"export const {enum_name} = {{{new_enum_body}}}", content, flags=re.DOTALL)
+    new_content = re.sub(enum_pattern, rf"export enum {enum_name} {{{new_enum_body}}}", content, flags=re.DOTALL)
 
     with open(js_file, 'w') as f:
       f.write(new_content)
