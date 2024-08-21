@@ -44,7 +44,7 @@ export class NotificationFrameworkBuilder {
     return this;
   }
 
-  public build(): NotificationFramework {
+  public buildX(): NotificationFramework {
     if (!this.logger) {
       this.logger = new Logger();
     }
@@ -52,6 +52,6 @@ export class NotificationFrameworkBuilder {
       throw new Error("dbConfig is required");
     }
 
-    return new NotificationFramework(this.logger, this.dbConfig);
+    return NotificationFramework.getInstanceX(this.logger, this.dbConfig);
   }
 }

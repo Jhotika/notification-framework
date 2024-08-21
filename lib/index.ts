@@ -21,6 +21,11 @@ export interface INotificationFramework {
   ) => UserNotificationMetadataService;
 }
 
+/**
+ * NotificationFramework is a singleton class that provides access to
+ * the NotificationService and UserNotificationMetadataService.
+ */
+
 export class NotificationFramework implements INotificationFramework {
   /**
    * Constructs a new instance of NotificationFramework.
@@ -28,7 +33,9 @@ export class NotificationFramework implements INotificationFramework {
    * @param dbConfig - The database configuration.
    */
 
-  constructor(
+  private static instance: NotificationFramework | null = null;
+
+  private constructor(
     private readonly logger: ILogger = new Logger(),
     private readonly dbConfig: IDatabaseConfig
   ) {
@@ -40,11 +47,30 @@ export class NotificationFramework implements INotificationFramework {
     }
   }
 
+  static getInstanceX = (
+    logger: ILogger,
+    dbConfig: IDatabaseConfig
+  ): NotificationFramework => {
+    if (!this.instance) {
+      this.instance = new NotificationFramework(logger, dbConfig);
+    } else {
+      if (this.instance.dbConfig !== dbConfig) {
+        throw new Error(
+          "Cannot instantiate multiple instances of NotificationFramework with different configurations., current instance configuration: " +
+            this.instance.dbConfig +
+            ", new instance configuration: " +
+            dbConfig
+        );
+      }
+    }
+    return this.instance;
+  };
+
   static withMongoCollections = (
     logger: ILogger,
     mongoCollections: IMongoCollectionConfig
   ): NotificationFramework => {
-    return new NotificationFramework(logger, {
+    return NotificationFramework.getInstanceX(logger, {
       type: DatabaseType.MongoDocuments,
       config: {
         notificationCollection: mongoCollections.notificationCollection,
@@ -58,7 +84,7 @@ export class NotificationFramework implements INotificationFramework {
     logger: ILogger,
     mongoConfig: IMongoDbConfig
   ): NotificationFramework => {
-    return new NotificationFramework(logger, {
+    return NotificationFramework.getInstanceX(logger, {
       type: DatabaseType.MongoDB,
       config: mongoConfig,
     });
