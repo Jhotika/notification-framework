@@ -1,9 +1,9 @@
 import { Collection } from "mongodb";
-import { AbstractNotification } from "../../models/abstractNotification";
+import { INotification } from "../../models/abstractNotification";
 import { AbstractDbConfig } from "./abstractDb.config";
 
 export interface IMongoCollectionConfig {
-  notificationCollection: Collection<AbstractNotification<string>>;
+  notificationCollection: Collection<INotification<string>>;
   userNotificationMetadataCollection: Collection;
 }
 

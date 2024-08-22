@@ -23,13 +23,13 @@ export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
 
   constructor(
-    public readonly viewerUserId: string,
+    public readonly viewerId: string,
     public readonly notificationRepository: INotificationRepository,
     public readonly userNotificationMetadataRepository: IUserNotificationMetadataRepository,
     public readonly logger: ILogger
   ) {
     this.userNotificationMetadataService = new UserNotificationMetadataService(
-      viewerUserId,
+      viewerId,
       this.userNotificationMetadataRepository,
       this.logger
     );
@@ -56,7 +56,7 @@ export class NotificationService {
 
   private genFetchAllForUserX = async (): Promise<AbstractNotification[]> => {
     const rawNotifications =
-      await this.notificationRepository.genFetchAllRawForViewerX();
+      await this.notificationRepository.genFetchAllRawForViewerX(this.viewerId);
     return (
       await Promise.all(
         rawNotifications.map((rawNotification: Object) =>
@@ -79,7 +79,7 @@ export class NotificationService {
 
   genMarkAllAsReadX = async (): Promise<void> => {
     try {
-      await this.notificationRepository.genMarkAllAsReadX();
+      await this.notificationRepository.genMarkAllAsReadX(this.viewerId);
     } catch (error) {
       this.logger.error(
         `Error marking all notifications as read: ${error.message}`
@@ -99,15 +99,15 @@ export class NotificationService {
       }
     } catch (error) {
       this.logger.error(
-        `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
+        `Error fetching notification for user ${this.viewerId}: ${error.message}`
       );
       throw new Error(
-        `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
+        `Error fetching notification for user ${this.viewerId}: ${error.message}`
       );
     }
 
     const notifPerm = await NotificationPerm.fromNotification(
-      this.viewerUserId,
+      this.viewerId,
       notif
     );
     if (!notifPerm.viewerIsOwner) {
@@ -139,24 +139,25 @@ export class NotificationService {
   ): Promise<AbstractNotification | null> => {
     try {
       const maybeNotification = await this.notificationRepository.genFetchX(
+        this.viewerId,
         notificationUid
       );
       if (!maybeNotification) {
         return null;
       }
       const perm = await NotificationPerm.fromNotification(
-        this.viewerUserId,
+        this.viewerId,
         maybeNotification as AbstractNotification
       );
       if (!perm.canView) {
         throw new UserPermissionError(
-          "User ${this.viewerUserId} doesn't have permission to view this notification: ${notificationUid}"
+          "User ${this.viewerId} doesn't have permission to view this notification: ${notificationUid}"
         );
       }
       return maybeNotification ? this.factory(maybeNotification) : null;
     } catch (error) {
       this.logger.error(
-        `Error fetching notification for user ${this.viewerUserId}: ${error.message}`
+        `Error fetching notification for user ${this.viewerId}: ${error.message}`
       );
       return null;
     }

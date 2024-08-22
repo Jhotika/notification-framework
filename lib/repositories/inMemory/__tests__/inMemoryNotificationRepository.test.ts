@@ -19,28 +19,28 @@ describe("InMemoryNotificationRepository", () => {
   );
 
   beforeEach(() => {
-    notificationRepository = new InMemoryNotificationRepository(viewerId);
+    notificationRepository = new InMemoryNotificationRepository();
   });
 
   it("should create a notification", async () => {
     await notificationRepository.genCreateX(notification);
     const fetchedNotification = await notificationRepository.genFetchX(
-      notification.uuid
+      notification.uid
     );
     expect(fetchedNotification).toEqual(notification);
   });
 
   it("should fetch a notification", async () => {
     const fetchedNotification = await notificationRepository.genFetchX(
-      notification.uuid
+      notification.uid
     );
     expect(fetchedNotification).toEqual(notification);
   });
 
   it("should mark a notification as read", async () => {
-    await notificationRepository.genMarkAsReadX(notification.uuid);
+    await notificationRepository.genMarkAsReadX(notification.uid);
     const fetchedNotification = await notificationRepository.genFetchX(
-      notification.uuid
+      notification.uid
     );
     expect(fetchedNotification?.isRead).toBe(true);
   });
@@ -66,13 +66,12 @@ describe("InMemoryNotificationRepository", () => {
       Date.now(),
       "some other value"
     );
-    const anotherNotificationRepository = new InMemoryNotificationRepository(
-      "random_user_id"
-    );
+    const anotherNotificationRepository = new InMemoryNotificationRepository();
     await anotherNotificationRepository.genCreateX(notificationAnotherUser);
     await notificationRepository.genCreateX(notification2);
-    const notifications =
-      await notificationRepository.genFetchAllRawForViewerX();
+    const notifications = await notificationRepository.genFetchAllRawForViewerX(
+      viewerId
+    );
     expect(notifications).toEqual([notification, notification2]);
   });
 
@@ -89,7 +88,9 @@ describe("InMemoryNotificationRepository", () => {
     );
     await notificationRepository.genCreateX(notification3);
     await notificationRepository.genMarkAllAsReadX();
-    const allNotifs = await notificationRepository.genFetchAllRawForViewerX();
+    const allNotifs = await notificationRepository.genFetchAllRawForViewerX(
+      viewerId
+    );
     expect(allNotifs.every((n) => n.isRead)).toBe(true);
   });
 });

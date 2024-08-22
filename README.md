@@ -13,7 +13,6 @@ This Framework provides a convenient interface and essential features for managi
     - [Basic Usage](#basic-usage)
     - [Builder Pattern](#builder-pattern)
   - [Configuration](#configuration)
-    - [MongoDB](#mongodb)
     - [Mongo Collections](#mongo-collections)
     - [In-Memory Database](#in-memory-database)
 - [For Developers](#for-developers)
@@ -46,7 +45,7 @@ Our journey to version 1.0.0 includes:
 
 - Interfaces for managing notifications and user-notification features.
 - Singleton pattern to ensure a single instance with consistent configuration.
-- Supports multiple database configurations, including MongoDB, Mongo collections, and in-memory databases (more options to come).
+- Supports multiple database configurations, including Mongo collections, and in-memory databases (more options to come).
 - Provides access to `NotificationService` and `UserNotificationMetadataService` for managing notifications and metadata.
 
 ## Installation
@@ -81,7 +80,7 @@ import { DatabaseType } from "notification-framework/lib/configs/db/database.con
 import { Logger } from "path/to/your/logger"; // Example logger
 
 const dbConfig = {
-  type: DatabaseType.MongoDB,
+  type: DatabaseType.MongoDocuments,
   config: {
     // MongoDB configuration here
   },
@@ -106,8 +105,9 @@ import { NotificationFrameworkBuilder } from "notification-framework/lib";
 import { Logger } from "path/to/your/logger"; // Example logger
 
 const builder = new NotificationFrameworkBuilder()
-  .withMongoDbConfig({
-    // MongoDB configuration here
+  .withMongoCollectionConfig({
+    notificationCollection, // your notification collection
+    userNotificationMetadataCollection, // your notification metadata collection
   });
   .withLogger(new Logger()) // optional
 
@@ -120,18 +120,6 @@ const userMetadataService =
 ```
 
 ## Configuration
-
-### MongoDB
-
-To configure the framework with MongoDB, provide the MongoDB configuration object:
-
-```typescript
-import { IMongoDbConfig } from "notification-framework/lib/configs/db/mongoDb.config";
-
-const mongoDbConfig: IMongoDbConfig = {
-  // MongoDB configuration options
-};
-```
 
 ### Mongo Collections
 

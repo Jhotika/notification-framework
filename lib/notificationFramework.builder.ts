@@ -2,7 +2,6 @@ import NotificationFramework from ".";
 import { DatabaseType, IDatabaseConfig } from "./configs/db/database.config";
 import { IInMemoryConfig } from "./configs/db/inMemory.config";
 import { IMongoCollectionConfig } from "./configs/db/mongoCollection.config";
-import { IMongoDbConfig } from "./configs/db/mongoDb.config";
 import { ILogger, Logger } from "./logger";
 
 export class NotificationFrameworkBuilder {
@@ -11,16 +10,6 @@ export class NotificationFrameworkBuilder {
 
   public withLogger(logger: ILogger): NotificationFrameworkBuilder {
     this.logger = logger;
-    return this;
-  }
-
-  public withMongoDbConfig(
-    config: IMongoDbConfig
-  ): NotificationFrameworkBuilder {
-    this.dbConfig = {
-      type: DatabaseType.MongoDB,
-      config,
-    };
     return this;
   }
 
@@ -44,7 +33,7 @@ export class NotificationFrameworkBuilder {
     return this;
   }
 
-  public buildX(): NotificationFramework {
+  public buildX = (): NotificationFramework => {
     if (!this.logger) {
       this.logger = new Logger();
     }
@@ -53,5 +42,5 @@ export class NotificationFrameworkBuilder {
     }
 
     return NotificationFramework.getInstanceX(this.dbConfig, this.logger);
-  }
+  };
 }

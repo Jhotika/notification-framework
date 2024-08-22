@@ -3,7 +3,7 @@ import { IUserNotificationMetadataRepository } from "../repositories/IUserNotifi
 
 export class UserNotificationMetadataService {
   constructor(
-    private readonly viewerUserId: string,
+    private readonly viewerId: string,
     private readonly repository: IUserNotificationMetadataRepository,
     private readonly logger: ILogger
   ) {}
@@ -11,24 +11,22 @@ export class UserNotificationMetadataService {
   genIfUserHasNewNotificationX = async (): Promise<boolean> => {
     try {
       const [userMetadata, latestNotifCreateTime] = await Promise.all([
-        this.repository.genFetchUserMetadataX(),
-        this.repository.genFetchLatestCreationTimeForUserX(),
+        this.repository.genFetchUserMetadataX(this.viewerId),
+        this.repository.genFetchLatestCreationTimeForUserX(this.viewerId),
       ]);
       const lastFetchTime = userMetadata?.lastFetchTime ?? 0;
       return latestNotifCreateTime > lastFetchTime;
     } catch (e) {
-      this.logger.error(
-        `Error fetching user metadata for ${this.viewerUserId}`
-      );
+      this.logger.error(`Error fetching user metadata for ${this.viewerId}`);
       throw e;
     }
   };
 
   genUpdateWatermarkForUserX = async (): Promise<void> => {
     try {
-      await this.repository.genUpdateWatermarkForUserX();
+      await this.repository.genUpdateWatermarkForUserX(this.viewerId);
     } catch (e) {
-      this.logger.error(`Error updating watermark for ${this.viewerUserId}`);
+      this.logger.error(`Error updating watermark for ${this.viewerId}`);
       throw e;
     }
   };

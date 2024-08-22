@@ -24,37 +24,26 @@ export class RepositoryFactory {
    * @returns An object containing the notification repositories.
    * @throws DatabaseNotSupportedError
    */
-  static getRepositoryX = (
-    viewerId: string,
-    dbConfig: IDatabaseConfig
-  ): IRepository => {
+  static getRepositoryX = (dbConfig: IDatabaseConfig): IRepository => {
     const dbType: string = dbConfig.type ?? process.env.ENABLED_DB_TYPE ?? "";
     switch (dbType) {
-      case DatabaseType.MongoDB:
-        return {
-          notificationRepository: new MongoNotificationRepository(viewerId),
-          userNotificationMetadataRepository:
-            new MongoUserNotificationMetadataRepository(viewerId),
-        };
       case DatabaseType.MongoDocuments:
         const config = dbConfig.config as IMongoCollectionConfig;
         return {
-          notificationRepository: new MongoNotificationRepository(
-            viewerId,
+          notificationRepository: MongoNotificationRepository.fromCollectionX(
             config.notificationCollection
           ),
           userNotificationMetadataRepository:
-            new MongoUserNotificationMetadataRepository(
-              viewerId,
+            MongoUserNotificationMetadataRepository.fromCollections(
               config.notificationCollection,
               config.userNotificationMetadataCollection
             ),
         };
       case DatabaseType.InMemory:
         return {
-          notificationRepository: new InMemoryNotificationRepository(viewerId),
+          notificationRepository: new InMemoryNotificationRepository(),
           userNotificationMetadataRepository:
-            new InMemoryUserNotificationMetadataRepository(viewerId),
+            new InMemoryUserNotificationMetadataRepository(),
         };
       default:
         throw new DatabaseNotSupportedError(
