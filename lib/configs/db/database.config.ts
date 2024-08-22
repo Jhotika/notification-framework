@@ -4,11 +4,6 @@ import {
   dbType as MongoCollectionDbType,
 } from "./mongoCollection.config";
 import {
-  IMongoDbConfig,
-  MongoDbConfig,
-  dbType as MongoDbType,
-} from "./mongoDb.config";
-import {
   IInMemoryConfig,
   InMemoryConfig,
   dbType as InMemoryDbType,
@@ -16,14 +11,13 @@ import {
 
 // Enum representing the supported database types.
 export enum DatabaseType {
-  MongoDB = MongoDbType,
   InMemory = InMemoryDbType,
   MongoDocuments = MongoCollectionDbType,
 }
 
 export interface IDatabaseConfig {
   type: DatabaseType;
-  config: IMongoDbConfig | IMongoCollectionConfig | IInMemoryConfig | null;
+  config: IMongoCollectionConfig | IInMemoryConfig | null;
 }
 
 export const verifyDatabaseConfig = (
@@ -36,9 +30,6 @@ export const verifyDatabaseConfig = (
     throw new Error("Missing database type");
   }
   switch (dbConfig.type) {
-    case DatabaseType.MongoDB:
-      MongoDbConfig.verifyConfigX(dbConfig.config as IMongoDbConfig);
-      break;
     case DatabaseType.InMemory:
       InMemoryConfig.verifyConfigX(dbConfig.config as IInMemoryConfig);
       break;

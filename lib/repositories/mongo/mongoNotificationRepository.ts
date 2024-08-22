@@ -1,42 +1,67 @@
-import { AbstractNotification } from "../../models/abstractNotification";
+import { Collection } from "mongodb";
+import { INotification } from "../../models/abstractNotification";
 import { INotificationRepository } from "../INotificationRepository";
 import { IPrivacyUnsafe } from "../IUserNotificationMetadataRepository";
-import { MongoNotificationCollection } from "./mongoCollections";
+import { ILogger, Logger } from "../../logger";
 
 export class MongoNotificationRepository
   implements INotificationRepository, IPrivacyUnsafe
 {
-  constructor(
-    private readonly viewerId: string,
-    private readonly collection = MongoNotificationCollection
+  private static instance: MongoNotificationRepository | null;
+  private constructor(
+    private readonly collection: Collection<INotification<string>>,
+    public logger: ILogger = new Logger()
   ) {}
 
-  genCreateX = async (notification: AbstractNotification): Promise<void> => {
+  static fromCollectionX = (
+    collection: Collection<INotification<string>>
+  ): MongoNotificationRepository => {
+    if (!MongoNotificationRepository.instance) {
+      MongoNotificationRepository.instance = new MongoNotificationRepository(
+        collection
+      );
+    } else if (
+      MongoNotificationRepository?.instance?.collection &&
+      MongoNotificationRepository.instance.collection !== collection
+    ) {
+      throw new Error(
+        "MongoNotificationRepository.fromCollection called with different collection" +
+          collection +
+          " " +
+          MongoNotificationRepository.instance?.collection
+      );
+    }
+    return MongoNotificationRepository.instance;
+  };
+
+  genCreateX = async (notification: INotification): Promise<void> => {
     await this.collection.insertOne(notification);
   };
 
-  genFetchX = async (notificationUid: string): Promise<Object | null> => {
+  genFetchX = async (
+    ownerUid: string,
+    notificationUid: string
+  ): Promise<Object | null> => {
     return await this.collection.findOne({
-      ownerUuid: this.viewerId,
-      uuid: notificationUid,
+      ownerUid,
+      uid: notificationUid,
     });
   };
 
-  genMarkAllAsReadX = async (): Promise<void> => {
-    await this.collection.updateMany(
-      { ownerUuid: this.viewerId },
-      { $set: { isRead: true } }
-    );
+  genMarkAllAsReadX = async (ownerUid: string): Promise<void> => {
+    await this.collection.updateMany({ ownerUid }, { $set: { isRead: true } });
   };
 
   genMarkAsReadX = async (uid: string): Promise<void> => {
-    await this.collection.updateOne({ uuid: uid }, { $set: { isRead: true } });
+    await this.collection.updateOne({ uid }, { $set: { isRead: true } });
   };
 
-  genFetchAllRawForViewerX = async (): Promise<Array<Object>> => {
+  genFetchAllRawForViewerX = async (
+    viewerUid: string
+  ): Promise<Array<Object>> => {
     return await this.collection
       .find({
-        ownerUuid: this.viewerId,
+        ownerUid: viewerUid,
       })
       .toArray();
   };

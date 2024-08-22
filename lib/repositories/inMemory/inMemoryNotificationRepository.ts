@@ -1,33 +1,30 @@
-import {
-  AbstractNotification,
-  INotification,
-} from "../../models/abstractNotification";
+import { INotification } from "../../models/abstractNotification";
 import { INotificationRepository } from "../INotificationRepository";
 import { IPrivacyUnsafe } from "../IUserNotificationMetadataRepository";
 
-export let notificationsMap = new Map<string, AbstractNotification>();
+export let notificationsMap = new Map<string, INotification>();
 
 export class InMemoryNotificationRepository
   implements INotificationRepository, IPrivacyUnsafe
 {
-  constructor(private readonly viewerId: string) {}
+  constructor() {}
 
-  genCreateX = async (notification: AbstractNotification): Promise<void> => {
-    if (notificationsMap.has(notification.uuid)) {
+  genCreateX = async (notification: INotification): Promise<void> => {
+    if (notificationsMap.has(notification.uid)) {
       throw new Error("Notification already exists");
     }
-    notificationsMap.set(notification.uuid, notification);
+    notificationsMap.set(notification.uid, notification);
   };
 
   genFetchX = async (
     notificationUid: string
-  ): Promise<AbstractNotification | null> => {
+  ): Promise<INotification | null> => {
     return notificationsMap.get(notificationUid) || null;
   };
 
   genMarkAllAsReadX = async (): Promise<void> => {
     Array.from(notificationsMap.values())
-      .filter((notification) => notification.ownerUuid === this.viewerId)
+      // .filter((notification) => notification.ownerUuid === this.viewerId)
       .forEach((notification) => {
         notification.isRead = true;
       });
@@ -40,9 +37,11 @@ export class InMemoryNotificationRepository
     }
   };
 
-  genFetchAllRawForViewerX = async (): Promise<Array<INotification>> => {
+  genFetchAllRawForViewerX = async (
+    userUid: string
+  ): Promise<Array<INotification>> => {
     return Array.from(notificationsMap.values()).filter(
-      (notification) => notification.ownerUuid === this.viewerId
+      (notification) => notification.ownerUid === userUid
     );
   };
 

@@ -4,7 +4,7 @@ export class NotificationPerm {
   constructor(
     public viewerUid: string,
     public notification: {
-      ownerUuid: string;
+      ownerUid: string;
     }
   ) {}
 
@@ -19,11 +19,11 @@ export class NotificationPerm {
     viewerUid: string,
     rawNotification: Object
   ) => {
-    return new NotificationPerm(viewerUid, rawNotification["ownerUuid"]);
+    return new NotificationPerm(viewerUid, rawNotification["ownerUid"]);
   };
 
   get viewerIsOwner() {
-    return this.notification.ownerUuid === this.viewerUid;
+    return this.notification.ownerUid === this.viewerUid;
   }
 
   get canView() {

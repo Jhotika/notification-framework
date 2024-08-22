@@ -10,25 +10,25 @@ interface IMockNotification {
 
 export class MockNotification extends AbstractNotification {
   constructor(
-    uuid: string,
+    uid: string,
     type: string,
     payload: Record<string, any>,
-    ownerUuid: string,
-    senderUuid: string,
+    ownerUid: string,
+    senderUid: string,
     isRead: boolean,
     createdAt: number,
     public readonly customField: string
   ) {
-    super(uuid, type, ownerUuid, senderUuid, isRead, payload, createdAt);
+    super(uid, type, ownerUid, senderUid, isRead, payload, createdAt);
   }
 
   genResponse = async (): Promise<IMockNotification> => {
     return {
       notification: {
-        uuid: this.uuid,
+        uid: this.uid,
         type: this.type,
         payload: this.payload,
-        ownerUuid: this.ownerUuid,
+        ownerUid: this.ownerUid,
         isRead: this.isRead,
         createdAt: this.createdAt,
       } as INotification,

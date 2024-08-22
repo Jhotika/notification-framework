@@ -1,25 +1,34 @@
+import { Collection } from "mongodb";
 import {
   IUserNotificationMetadata,
   IUserNotificationMetadataRepository,
 } from "../IUserNotificationMetadataRepository";
-import {
-  MongoNotificationCollection,
-  MongoNotificationUserMetadataCollection,
-} from "./mongoCollections";
+import { INotification } from "../../models/abstractNotification";
 
 export class MongoUserNotificationMetadataRepository
   implements IUserNotificationMetadataRepository
 {
-  constructor(
-    public readonly viewerId: string,
-    private readonly notificationCollection = MongoNotificationCollection,
-    private readonly userMetadataCollection = MongoNotificationUserMetadataCollection
+  private constructor(
+    private readonly notificationCollection: Collection<INotification<string>>,
+    private readonly userMetadataCollection: Collection
   ) {}
 
-  genFetchLatestCreationTimeForUserX = async (): Promise<number> => {
+  static fromCollections = (
+    notificationCollection: Collection<INotification<string>>,
+    userMetadataCollection: Collection
+  ): MongoUserNotificationMetadataRepository => {
+    return new MongoUserNotificationMetadataRepository(
+      notificationCollection,
+      userMetadataCollection
+    );
+  };
+
+  genFetchLatestCreationTimeForUserX = async (
+    userId: string
+  ): Promise<number> => {
     const notifications = await this.notificationCollection
       .find({
-        ownerUuid: this.viewerId,
+        ownerUid: userId,
       })
       .sort({ createTime: -1 })
       .limit(1)
@@ -27,28 +36,30 @@ export class MongoUserNotificationMetadataRepository
     return notifications.length > 0 ? notifications[0].createdAt : 0;
   };
 
-  genUpdateWatermarkForUserX = async (): Promise<void> => {
+  genUpdateWatermarkForUserX = async (userId: string): Promise<void> => {
     const lastFetchTime = Date.now();
     await this.userMetadataCollection.updateOne(
-      { userId: this.viewerId },
+      { userId },
       { $set: { lastFetchTime: lastFetchTime } },
       { upsert: true }
     );
   };
 
-  genFetchUserMetadataX = async (): Promise<IUserNotificationMetadata> => {
+  genFetchUserMetadataX = async (
+    userId: string
+  ): Promise<IUserNotificationMetadata> => {
     const userMetadata = await this.userMetadataCollection.findOne({
-      userId: this.viewerId,
+      userId: userId,
     });
     return {
-      userId: this.viewerId,
+      userId: userId,
       lastFetchTime: userMetadata?.lastFetchTime ?? 0,
     };
   };
 
-  genFetchNumUnreadNotificationsX = async (): Promise<number> => {
+  genFetchNumUnreadNotificationsX = async (userId: string): Promise<number> => {
     return await this.notificationCollection.countDocuments({
-      ownerUuid: this.viewerId,
+      ownerUid: userId,
       isRead: false,
     });
   };

@@ -5,10 +5,9 @@ import {
 } from "./configs/db/database.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
-import {
-  IRepository,
-  RepositoryFactory,
-} from "./repositories/repositoryFactory";
+import { INotificationRepository } from "./repositories/INotificationRepository";
+import { IUserNotificationMetadataRepository } from "./repositories/IUserNotificationMetadataRepository";
+import { RepositoryFactory } from "./repositories/repositoryFactory";
 import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
@@ -23,7 +22,6 @@ export interface INotificationFramework {
  * NotificationFramework is a singleton class that provides access to
  * the NotificationService and UserNotificationMetadataService.
  */
-
 export class NotificationFramework implements INotificationFramework {
   /**
    * Constructs a new instance of NotificationFramework.
@@ -32,6 +30,8 @@ export class NotificationFramework implements INotificationFramework {
    */
 
   private static instance: NotificationFramework | null = null;
+  public notificationRepository: INotificationRepository;
+  public userNotificationMetadataRepository: IUserNotificationMetadataRepository;
 
   private constructor(
     private readonly dbConfig: IDatabaseConfig,
@@ -51,6 +51,11 @@ export class NotificationFramework implements INotificationFramework {
   ): NotificationFramework => {
     if (!this.instance) {
       this.instance = new NotificationFramework(dbConfig, logger);
+      const { notificationRepository, userNotificationMetadataRepository } =
+        RepositoryFactory.getRepositoryX(dbConfig);
+      this.instance.notificationRepository = notificationRepository;
+      this.instance.userNotificationMetadataRepository =
+        userNotificationMetadataRepository;
     } else {
       if (this.instance.dbConfig !== dbConfig) {
         throw new Error(
@@ -70,14 +75,10 @@ export class NotificationFramework implements INotificationFramework {
    */
   getNotificationServiceX = (viewerId: string): NotificationService => {
     try {
-      const repository: IRepository = RepositoryFactory.getRepositoryX(
-        viewerId,
-        this.dbConfig
-      );
       return new NotificationService(
         viewerId,
-        repository.notificationRepository,
-        repository.userNotificationMetadataRepository,
+        this.notificationRepository,
+        this.userNotificationMetadataRepository,
         this.logger
       );
     } catch (error) {
@@ -94,13 +95,9 @@ export class NotificationFramework implements INotificationFramework {
     viewerId: string
   ): UserNotificationMetadataService => {
     try {
-      const repository: IRepository = RepositoryFactory.getRepositoryX(
-        viewerId,
-        this.dbConfig
-      );
       return new UserNotificationMetadataService(
         viewerId,
-        repository.userNotificationMetadataRepository,
+        this.userNotificationMetadataRepository,
         this.logger
       );
     } catch (error) {
