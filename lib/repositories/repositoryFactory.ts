@@ -24,12 +24,29 @@ export class RepositoryFactory {
    * @returns An object containing the notification repositories.
    * @throws DatabaseNotSupportedError
    */
+  private static instance: IRepository | null = null;
+  private static config: IDatabaseConfig | null = null;
+
   static getRepositoryX = (dbConfig: IDatabaseConfig): IRepository => {
+    if (RepositoryFactory.instance != null) {
+      if (RepositoryFactory.config === dbConfig) {
+        return RepositoryFactory.instance;
+      } else {
+        throw new Error(
+          "Repository already initialized with different configuration settings. Existing config:" +
+            JSON.stringify(RepositoryFactory.config) +
+            "\n New config: \n" +
+            JSON.stringify(dbConfig)
+        );
+      }
+    }
+    RepositoryFactory.config = dbConfig;
     const dbType: string = dbConfig.type ?? process.env.ENABLED_DB_TYPE ?? "";
+    let repository: IRepository;
     switch (dbType) {
       case DatabaseType.MongoDocuments:
         const config = dbConfig.config as IMongoCollectionConfig;
-        return {
+        repository = {
           notificationRepository: MongoNotificationRepository.fromCollectionX(
             config.notificationCollection
           ),
@@ -39,16 +56,20 @@ export class RepositoryFactory {
               config.userNotificationMetadataCollection
             ),
         };
+        break;
       case DatabaseType.InMemory:
-        return {
+        repository = {
           notificationRepository: new InMemoryNotificationRepository(),
           userNotificationMetadataRepository:
             new InMemoryUserNotificationMetadataRepository(),
         };
+        break;
       default:
         throw new DatabaseNotSupportedError(
           `Database type ${dbType} is not supported`
         );
     }
+    RepositoryFactory.instance = repository;
+    return repository;
   };
 }
