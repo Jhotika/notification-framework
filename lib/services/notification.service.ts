@@ -1,6 +1,6 @@
 import type { ILogger } from "../logger";
 import {
-  AbstractNotification,
+  INotification,
   INotificationResponse,
 } from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
@@ -11,7 +11,7 @@ import { IUserNotificationMetadataRepository } from "../repositories/IUserNotifi
 import { UserPermissionError } from "../errors/userPermissionError";
 
 const notificationFactoryMap: {
-  [key: string]: (raw: Object) => AbstractNotification;
+  [key: string]: (raw: Object) => INotification;
 } = {
   // NotificationTypes -> NotificationClass.
   // This is a map of all the notification types to their respective classes.
@@ -35,7 +35,7 @@ export class NotificationService {
     );
   }
 
-  factory = (rawNotification: Object): AbstractNotification | null => {
+  factory = (rawNotification: Object): INotification | null => {
     const notificationType = rawNotification["type"] as string;
     const factoryMethod = notificationFactoryMap[notificationType];
     if (!factoryMethod) {
@@ -48,13 +48,11 @@ export class NotificationService {
     }
   };
 
-  genFetchX = async (uuid: string): Promise<AbstractNotification | null> => {
-    return (await this.genFetchNotificationX(
-      uuid
-    )) as AbstractNotification | null;
+  genFetchX = async (uuid: string): Promise<INotification | null> => {
+    return (await this.genFetchNotificationX(uuid)) as INotification | null;
   };
 
-  private genFetchAllForUserX = async (): Promise<AbstractNotification[]> => {
+  private genFetchAllForUserX = async (): Promise<INotification[]> => {
     const rawNotifications =
       await this.notificationRepository.genFetchAllRawForViewerX(this.viewerId);
     return (
@@ -63,14 +61,14 @@ export class NotificationService {
           this.factory(rawNotification)
         )
       )
-    ).filter((notif) => notif != null) as AbstractNotification[];
+    ).filter((notif) => notif != null) as INotification[];
   };
 
   genFetchAllResponseForUserX = async (): Promise<INotificationResponse[]> => {
     const notifications = await this.genFetchAllForUserX();
     return (
       await Promise.all(
-        notifications.map((notification: AbstractNotification) =>
+        notifications.map((notification: INotification) =>
           notification ? notification.genResponse() : null
         )
       )
@@ -91,7 +89,7 @@ export class NotificationService {
   };
 
   genMarkAsReadX = async (uuid: string): Promise<void> => {
-    let notif: AbstractNotification | null;
+    let notif: INotification | null;
     try {
       notif = await this.genFetchNotificationX(uuid);
       if (!notif) {
@@ -118,7 +116,7 @@ export class NotificationService {
     await this.notificationRepository.genMarkAsReadX(uuid);
   };
 
-  genSave = async (notification: AbstractNotification): Promise<boolean> => {
+  genSave = async (notification: INotification): Promise<boolean> => {
     try {
       await this.notificationRepository.genCreateX(notification);
     } catch (error) {
@@ -136,7 +134,7 @@ export class NotificationService {
 
   genFetchNotificationX = async (
     notificationUid: string
-  ): Promise<AbstractNotification | null> => {
+  ): Promise<INotification | null> => {
     try {
       const maybeNotification = await this.notificationRepository.genFetchX(
         this.viewerId,
@@ -147,7 +145,7 @@ export class NotificationService {
       }
       const perm = await NotificationPerm.fromNotification(
         this.viewerId,
-        maybeNotification as AbstractNotification
+        maybeNotification as INotification
       );
       if (!perm.canView) {
         throw new UserPermissionError(
@@ -160,6 +158,18 @@ export class NotificationService {
         `Error fetching notification for user ${this.viewerId}: ${error.message}`
       );
       return null;
+    }
+  };
+
+  genDeleteNotification = async (notificationUid: string): Promise<boolean> => {
+    try {
+      await this.notificationRepository.genDeleteX(notificationUid);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error deleting notification for user ${this.viewerId}: ${error.message}`
+      );
+      return false;
     }
   };
 }

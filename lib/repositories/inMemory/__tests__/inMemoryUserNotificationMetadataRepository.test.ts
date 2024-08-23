@@ -3,8 +3,8 @@
 import { InMemoryUserNotificationMetadataRepository } from "../inMemoryUserNotificationMetadataRepository";
 
 import { describe, expect, it } from "@jest/globals";
-import { MockNotification } from "./MockNotification";
 import { InMemoryNotificationRepository } from "../inMemoryNotificationRepository";
+import { MockNotification } from "./MockNotification";
 
 describe("InMemory", () => {
   const viewerId = "viewer__0001";
@@ -14,10 +14,10 @@ describe("InMemory", () => {
   const notification = new MockNotification(
     "1", // uuid
     "type",
-    {},
     viewerId,
     senderUuid,
     false,
+    {},
     Date.now() - 200,
     "customValue"
   );
@@ -26,10 +26,10 @@ describe("InMemory", () => {
     const newerNotif = new MockNotification(
       "2", // different uuid
       "type",
-      {},
       viewerId,
       senderUuid,
       false,
+      {},
       Date.now() - 200,
       "random customValue"
     );
@@ -39,10 +39,10 @@ describe("InMemory", () => {
     const someoneElsesNotif = new MockNotification(
       "rand_uuid_user_2", // some random uuid
       "type",
-      {},
       "someone_elses_id",
       senderUuid,
       false,
+      {},
       Date.now(), // newer than newerNotif, but not for viewerId
       "foo"
     );

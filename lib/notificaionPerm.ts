@@ -1,4 +1,4 @@
-import { AbstractNotification } from "./models/abstractNotification";
+import type { INotification } from "./models/abstractNotification";
 
 export class NotificationPerm {
   constructor(
@@ -10,16 +10,9 @@ export class NotificationPerm {
 
   static fromNotification = async (
     viewerUid: string,
-    notification: AbstractNotification
+    notification: INotification
   ) => {
     return new NotificationPerm(viewerUid, notification);
-  };
-
-  static fromRawNotification = async (
-    viewerUid: string,
-    rawNotification: Object
-  ) => {
-    return new NotificationPerm(viewerUid, rawNotification["ownerUid"]);
   };
 
   get viewerIsOwner() {

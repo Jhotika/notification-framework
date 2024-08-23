@@ -10,10 +10,10 @@ describe("InMemoryNotificationRepository", () => {
   const notification = new MockNotification(
     "1", // uuid
     "type",
-    {},
     viewerId,
     senderUuid,
     false,
+    {},
     Date.now(),
     "customValue"
   );
@@ -49,20 +49,20 @@ describe("InMemoryNotificationRepository", () => {
     const notification2 = new MockNotification(
       "2", // different uuid
       "type",
-      {},
       viewerId,
       senderUuid,
       false,
+      {},
       Date.now(),
       "random customValue"
     );
     const notificationAnotherUser = new MockNotification(
       "rand_uuid_user_2", // some random uuid
       "type",
-      {},
       "random_user_id",
       senderUuid,
       false,
+      {},
       Date.now(),
       "some other value"
     );
@@ -79,10 +79,10 @@ describe("InMemoryNotificationRepository", () => {
     const notification3 = new MockNotification(
       "3", // different uuid
       "type",
-      {},
       viewerId,
       senderUuid,
       false,
+      {},
       Date.now(),
       "bar"
     );
