@@ -1,38 +1,30 @@
-import {
-  AbstractNotification,
-  INotification,
-} from "../../../models/abstractNotification";
+import { INotification } from "../../../models/abstractNotification";
 
-interface IMockNotification {
-  notification: INotification;
+interface IMockNotification extends INotification {
   customField: string;
 }
 
-export class MockNotification extends AbstractNotification {
-  constructor(
-    uid: string,
-    type: string,
-    payload: Record<string, any>,
-    ownerUid: string,
-    senderUid: string,
-    isRead: boolean,
-    createdAt: number,
-    public readonly customField: string
-  ) {
-    super(uid, type, ownerUid, senderUid, isRead, payload, createdAt);
-  }
+interface IMockNotificationResponse {
+  notification: IMockNotification;
+  customResponseField: string;
+}
 
-  genResponse = async (): Promise<IMockNotification> => {
+export class MockNotification implements IMockNotification {
+  constructor(
+    public readonly uid: string,
+    public readonly type: string,
+    public readonly ownerUid: string,
+    public readonly senderUid: string,
+    public readonly isRead: boolean,
+    public readonly payload: Record<string, any>,
+    public readonly createdAt: number,
+    public readonly customField: string
+  ) {}
+
+  genResponse = async (): Promise<IMockNotificationResponse> => {
     return {
-      notification: {
-        uid: this.uid,
-        type: this.type,
-        payload: this.payload,
-        ownerUid: this.ownerUid,
-        isRead: this.isRead,
-        createdAt: this.createdAt,
-      } as INotification,
-      customField: this.customField,
+      notification: this,
+      customResponseField: "custom-response",
     };
   };
 }
