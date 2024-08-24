@@ -26,10 +26,9 @@ export class InMemoryUserNotificationMetadataRepository
   };
 
   genUpdateWatermarkForUserX = async (userId: string): Promise<void> => {
-    const lastFetchTime = Date.now();
     userNotificationMetadataMap.set(userId, {
-      userId: userId,
-      lastFetchTime,
+      userId,
+      lastFetchTime: Date.now(),
     });
   };
 

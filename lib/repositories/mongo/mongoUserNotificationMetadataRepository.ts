@@ -1,9 +1,9 @@
 import { Collection } from "mongodb";
+import { INotification } from "../../models/abstractNotification";
 import {
   IUserNotificationMetadata,
   IUserNotificationMetadataRepository,
 } from "../IUserNotificationMetadataRepository";
-import { INotification } from "../../models/abstractNotification";
 
 export class MongoUserNotificationMetadataRepository
   implements IUserNotificationMetadataRepository
@@ -40,7 +40,7 @@ export class MongoUserNotificationMetadataRepository
     const lastFetchTime = Date.now();
     await this.userMetadataCollection.updateOne(
       { userId },
-      { $set: { lastFetchTime: lastFetchTime } },
+      { $set: { lastFetchTime } },
       { upsert: true }
     );
   };

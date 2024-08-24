@@ -2,7 +2,7 @@ export interface INotificationRepository {
   // genCreateX is a method that creates a notification
   genCreateX(notification: Object): Promise<void>;
   // genFetchX is a method that fetches a notification for a user as a raw object
-  genFetchX(ownerId: string, notificationUid: string): Promise<Object | null>;
+  genFetchX(notificationUid: string): Promise<Object | null>;
   // genFetchAllRawForViewerX is a method that fetches all notifications for a user as raw objects
   genFetchAllRawForViewerX(userId: string): Promise<Array<Object>>;
 
