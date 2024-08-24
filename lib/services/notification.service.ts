@@ -1,5 +1,6 @@
 import type { ILogger } from "../logger";
 import {
+  AbstractNotification,
   INotification,
   INotificationResponse,
 } from "../models/abstractNotification";
@@ -37,7 +38,7 @@ export class NotificationService {
     );
   }
 
-  factory = (rawNotification: Object): INotification | null => {
+  factory = (rawNotification: Record<string, any>): INotification | null => {
     const notificationType = rawNotification["type"] as string;
     const factoryMethod = notificationFactoryMap[notificationType];
     if (!factoryMethod) {
@@ -58,7 +59,7 @@ export class NotificationService {
     return (
       await Promise.all(
         rawNotifications.map((rawNotification: Object) =>
-          this.factory(rawNotification)
+          this.factory(rawNotification as INotification)
         )
       )
     ).filter((notif) => notif != null) as INotification[];
@@ -68,7 +69,7 @@ export class NotificationService {
     const notifications = await this.genFetchAllForUserX();
     return (
       await Promise.all(
-        notifications.map((notification: INotification) =>
+        notifications.map((notification: AbstractNotification) =>
           notification ? notification.genResponse() : null
         )
       )

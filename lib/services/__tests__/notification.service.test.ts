@@ -119,4 +119,29 @@ describe("NotificationService", () => {
     const fetchedNotif2 = await notificationRepository.genFetchX(notif2.uid);
     expect(fetchedNotif2).toBeNull();
   });
+
+  test("fetch all notifications for a user", async () => {
+    const notif1 = MockNotification.new(ownerId, viewerId, "test 1");
+    const notif2 = MockNotification.new(ownerId, viewerId, "test 2");
+    await Promise.all([
+      sendersNotificationService.genSave(notif1),
+      sendersNotificationService.genSave(notif2),
+    ]);
+
+    const notifications =
+      await ownersNotificationService.genFetchAllResponseForUserX();
+
+    expect(notifications.length).toBe(2);
+
+    expect(notifications).toEqual([
+      {
+        notification: notif1.toINotification(),
+        customResponseField: "custom-response",
+      },
+      {
+        notification: notif2.toINotification(),
+        customResponseField: "custom-response",
+      },
+    ]);
+  });
 });

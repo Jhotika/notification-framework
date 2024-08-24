@@ -1,5 +1,8 @@
 import { v4 } from "uuid";
-import { INotification } from "../models/abstractNotification";
+import {
+  AbstractNotification,
+  INotification,
+} from "../models/abstractNotification";
 
 interface IMockNotification extends INotification {
   customField: string;
@@ -10,7 +13,10 @@ interface IMockNotificationResponse {
   customResponseField: string;
 }
 
-export class MockNotification implements IMockNotification {
+export class MockNotification
+  extends AbstractNotification
+  implements IMockNotification
+{
   private static __type = "MockNotification";
   private constructor(
     public readonly uid: string,
@@ -21,7 +27,9 @@ export class MockNotification implements IMockNotification {
     public readonly payload: Record<string, any>,
     public readonly createdAt: number,
     public readonly customField: string
-  ) {}
+  ) {
+    super();
+  }
 
   static new(
     ownerUid: string,
@@ -40,22 +48,35 @@ export class MockNotification implements IMockNotification {
     );
   }
 
-  static fromJson(raw: Record<string, any>): MockNotification {
+  static fromJson(json: Record<string, any>): MockNotification {
     return new MockNotification(
-      raw.uid,
-      raw.type,
-      raw.ownerUid,
-      raw.senderUid,
-      raw.isRead,
-      raw.payload,
-      raw.createdAt,
-      raw.customField
+      json.uid,
+      json.type,
+      json.ownerUid,
+      json.senderUid,
+      json.isRead,
+      json.payload,
+      json.createdAt,
+      json.customField
     );
+  }
+
+  toINotification(): IMockNotification {
+    return {
+      uid: this.uid,
+      type: this.type,
+      ownerUid: this.ownerUid,
+      senderUid: this.senderUid,
+      isRead: this.isRead,
+      payload: this.payload,
+      createdAt: this.createdAt,
+      customField: this.customField,
+    };
   }
 
   genResponse = async (): Promise<IMockNotificationResponse> => {
     return {
-      notification: this,
+      notification: this.toINotification(),
       customResponseField: "custom-response",
     };
   };
