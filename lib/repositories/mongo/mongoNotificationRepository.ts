@@ -38,12 +38,8 @@ export class MongoNotificationRepository
     await this.collection.insertOne(notification);
   };
 
-  genFetchX = async (
-    ownerUid: string,
-    notificationUid: string
-  ): Promise<Object | null> => {
+  genFetchX = async (notificationUid: string): Promise<Object | null> => {
     return await this.collection.findOne({
-      ownerUid,
       uid: notificationUid,
     });
   };

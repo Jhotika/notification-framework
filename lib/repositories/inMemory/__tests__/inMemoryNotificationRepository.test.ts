@@ -1,20 +1,15 @@
 import { InMemoryNotificationRepository } from "../inMemoryNotificationRepository";
 
 import { describe, expect, it } from "@jest/globals";
-import { MockNotification } from "./MockNotification";
+import { MockNotification } from "../../../__mocks__/MockNotification";
 
 describe("InMemoryNotificationRepository", () => {
   const viewerId = "viewer__0001";
   let notificationRepository: InMemoryNotificationRepository;
   const senderUuid = "sender__0001";
-  const notification = new MockNotification(
-    "1", // uuid
-    "type",
+  const notification = MockNotification.new(
     viewerId,
     senderUuid,
-    false,
-    {},
-    Date.now(),
     "customValue"
   );
 
@@ -46,24 +41,14 @@ describe("InMemoryNotificationRepository", () => {
   });
 
   it("should fetch all notifications for a user", async () => {
-    const notification2 = new MockNotification(
-      "2", // different uuid
-      "type",
+    const notification2 = MockNotification.new(
       viewerId,
       senderUuid,
-      false,
-      {},
-      Date.now(),
       "random customValue"
     );
-    const notificationAnotherUser = new MockNotification(
-      "rand_uuid_user_2", // some random uuid
-      "type",
+    const notificationAnotherUser = MockNotification.new(
       "random_user_id",
       senderUuid,
-      false,
-      {},
-      Date.now(),
       "some other value"
     );
     const anotherNotificationRepository = new InMemoryNotificationRepository();
@@ -76,16 +61,7 @@ describe("InMemoryNotificationRepository", () => {
   });
 
   it("should mark all notifications as read", async () => {
-    const notification3 = new MockNotification(
-      "3", // different uuid
-      "type",
-      viewerId,
-      senderUuid,
-      false,
-      {},
-      Date.now(),
-      "bar"
-    );
+    const notification3 = MockNotification.new(viewerId, senderUuid, "bar");
     await notificationRepository.genCreateX(notification3);
     await notificationRepository.genMarkAllAsReadX();
     const allNotifs = await notificationRepository.genFetchAllRawForViewerX(

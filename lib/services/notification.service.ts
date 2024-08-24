@@ -7,16 +7,18 @@ import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
-import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
+import { MockNotification } from "../__mocks__/MockNotification";
 import { UserPermissionError } from "../errors/userPermissionError";
+import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
 
 const notificationFactoryMap: {
-  [key: string]: (raw: Object) => INotification;
+  [key: string]: (json: Object) => INotification;
 } = {
   // NotificationTypes -> NotificationClass.
   // This is a map of all the notification types to their respective classes.
   // This is used to instantiate the correct class when fetching notifications from the database.
   // For example, if the type of the notification is "A", the factory method will return an instance of ANotification.
+  MockNotification: (json: Object) => MockNotification.fromJson(json),
 };
 
 export class NotificationService {
@@ -48,13 +50,11 @@ export class NotificationService {
     }
   };
 
-  genFetchX = async (uuid: string): Promise<INotification | null> => {
-    return (await this.genFetchNotificationX(uuid)) as INotification | null;
-  };
-
   private genFetchAllForUserX = async (): Promise<INotification[]> => {
     const rawNotifications =
       await this.notificationRepository.genFetchAllRawForViewerX(this.viewerId);
+    // intentinally running async
+    await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
     return (
       await Promise.all(
         rawNotifications.map((rawNotification: Object) =>
@@ -119,16 +119,10 @@ export class NotificationService {
   genSave = async (notification: INotification): Promise<boolean> => {
     try {
       await this.notificationRepository.genCreateX(notification);
+      return true;
     } catch (error) {
       this.logger.error(`Error saving notification: ${error.message}`);
       return false;
-    }
-    try {
-      await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
-    } catch (error) {
-      this.logger.error(`Error updating watermark for user: ${error.message}`);
-    } finally {
-      return true;
     }
   };
 
@@ -136,22 +130,22 @@ export class NotificationService {
     notificationUid: string
   ): Promise<INotification | null> => {
     try {
-      const maybeNotification = await this.notificationRepository.genFetchX(
-        this.viewerId,
-        notificationUid
-      );
-      if (!maybeNotification) {
+      const maybeNotification__PRIVACY_UNSAFE =
+        await this.notificationRepository.genFetchX(notificationUid);
+      if (!maybeNotification__PRIVACY_UNSAFE) {
         return null;
       }
       const perm = await NotificationPerm.fromNotification(
         this.viewerId,
-        maybeNotification as INotification
+        maybeNotification__PRIVACY_UNSAFE as INotification
       );
       if (!perm.canView) {
         throw new UserPermissionError(
           "User ${this.viewerId} doesn't have permission to view this notification: ${notificationUid}"
         );
       }
+      const maybeNotification =
+        maybeNotification__PRIVACY_UNSAFE as INotification;
       return maybeNotification ? this.factory(maybeNotification) : null;
     } catch (error) {
       this.logger.error(
@@ -161,7 +155,36 @@ export class NotificationService {
     }
   };
 
-  genDeleteNotification = async (notificationUid: string): Promise<boolean> => {
+  genDeleteNotificationX = async (
+    notificationUid: string
+  ): Promise<boolean> => {
+    const existingNotif = await this.genFetchNotificationX(notificationUid);
+    if (!existingNotif) {
+      return false;
+    }
+    const notifPerm = await NotificationPerm.fromNotification(
+      this.viewerId,
+      existingNotif as INotification
+    );
+    // Only the owner of the notification can delete it
+    // TODO: Add support for super admins
+    if (!notifPerm.viewerIsOwner) {
+      throw new UserPermissionError(
+        "User doesn't have permission to delete this notification"
+      );
+    }
+    try {
+      await this.notificationRepository.genDeleteX(notificationUid);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error deleting notification for user ${this.viewerId}: ${error.message}`
+      );
+      return false;
+    }
+  };
+
+  genDeleteNotificationBypassingPermCheck = async (notificationUid: string) => {
     try {
       await this.notificationRepository.genDeleteX(notificationUid);
       return true;

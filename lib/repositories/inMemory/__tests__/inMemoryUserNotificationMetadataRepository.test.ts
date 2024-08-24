@@ -1,49 +1,32 @@
-// unit test for ../inMemoryUserNotificationMetadataRepository.ts
-
 import { InMemoryUserNotificationMetadataRepository } from "../inMemoryUserNotificationMetadataRepository";
 
 import { describe, expect, it } from "@jest/globals";
 import { InMemoryNotificationRepository } from "../inMemoryNotificationRepository";
-import { MockNotification } from "./MockNotification";
+import { MockNotification } from "../../../__mocks__/MockNotification";
 
 describe("InMemory", () => {
   const viewerId = "viewer__0001";
   const repository = new InMemoryUserNotificationMetadataRepository();
   const notifRepository = new InMemoryNotificationRepository();
   const senderUuid = "sender__0001";
-  const notification = new MockNotification(
-    "1", // uuid
-    "type",
+  const notification = MockNotification.new(
     viewerId,
     senderUuid,
-    false,
-    {},
-    Date.now() - 200,
     "customValue"
   );
   notifRepository.genCreateX(notification);
   it("should fetch the latest notification creation time for user", async () => {
-    const newerNotif = new MockNotification(
-      "2", // different uuid
-      "type",
+    const newerNotif = MockNotification.new(
       viewerId,
       senderUuid,
-      false,
-      {},
-      Date.now() - 200,
       "random customValue"
     );
 
     notifRepository.genCreateX(newerNotif);
 
-    const someoneElsesNotif = new MockNotification(
-      "rand_uuid_user_2", // some random uuid
-      "type",
+    const someoneElsesNotif = MockNotification.new(
       "someone_elses_id",
       senderUuid,
-      false,
-      {},
-      Date.now(), // newer than newerNotif, but not for viewerId
       "foo"
     );
     const someoneElsesRepo = new InMemoryNotificationRepository();
