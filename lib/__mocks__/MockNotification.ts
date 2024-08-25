@@ -17,18 +17,19 @@ export class MockNotification
   extends AbstractNotification
   implements IMockNotification
 {
-  private static __type = "MockNotification";
-  private constructor(
-    public readonly uid: string,
-    public readonly type: string = MockNotification.__type,
-    public readonly ownerUid: string,
-    public readonly senderUid: string,
-    public readonly isRead: boolean,
-    public readonly payload: Record<string, any>,
-    public readonly createdAt: number,
-    public readonly customField: string
-  ) {
-    super();
+  private static readonly __type = "MockNotification";
+
+  public readonly uid: string;
+  public readonly type = MockNotification.__type;
+  public readonly ownerUid: string;
+  public readonly senderUid: string;
+  public readonly isRead: boolean;
+  public readonly createdAt: number;
+  public readonly payload: Record<string, any>;
+  public readonly customField: string;
+
+  constructor(data: IMockNotification) {
+    super(data);
   }
 
   static new(
@@ -36,29 +37,39 @@ export class MockNotification
     senderUid: string,
     customField: string = "foo"
   ): MockNotification {
-    return new MockNotification(
-      v4(),
-      MockNotification.__type,
+    return new MockNotification({
+      uid: v4(),
+      type: MockNotification.__type,
       ownerUid,
       senderUid,
-      false,
-      {},
-      Date.now(),
-      customField
-    );
+      isRead: false,
+      createdAt: Date.now(),
+      payload: {},
+      customField,
+    });
   }
 
   static fromJson(json: Record<string, any>): MockNotification {
-    return new MockNotification(
-      json.uid,
-      json.type,
-      json.ownerUid,
-      json.senderUid,
-      json.isRead,
-      json.payload,
-      json.createdAt,
-      json.customField
-    );
+    const {
+      uid,
+      type,
+      ownerUid,
+      senderUid,
+      isRead,
+      createdAt,
+      payload,
+      customField,
+    } = json;
+    return new MockNotification({
+      uid,
+      type,
+      ownerUid,
+      senderUid,
+      isRead,
+      createdAt,
+      payload,
+      customField,
+    });
   }
 
   toINotification(): IMockNotification {

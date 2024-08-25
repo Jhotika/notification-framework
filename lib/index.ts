@@ -11,6 +11,12 @@ import { RepositoryFactory } from "./repositories/repositoryFactory";
 import { NotificationService } from "./services/notification.service";
 import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
+import { NotificationServiceBuilder } from "./services/notification.service.builder";
+import {
+  AbstractNotification,
+  ConcreteClass,
+} from "./models/abstractNotification";
+
 export interface INotificationFramework {
   getNotificationServiceX: (viewerId: string) => NotificationService;
   getUserNotificationMetadataServiceX: (
@@ -35,7 +41,10 @@ export class NotificationFramework implements INotificationFramework {
 
   private constructor(
     private readonly dbConfig: IDatabaseConfig,
-    private readonly logger: ILogger = new Logger()
+    private readonly logger: ILogger = new Logger(),
+    private readonly notificationClasess: Readonly<
+      Array<ConcreteClass<AbstractNotification<string>>>
+    >
   ) {
     try {
       verifyDatabaseConfig(dbConfig);
@@ -47,10 +56,17 @@ export class NotificationFramework implements INotificationFramework {
 
   static getInstanceX = (
     dbConfig: IDatabaseConfig,
-    logger: ILogger
+    logger: ILogger,
+    notificationClasses: Readonly<
+      Array<ConcreteClass<AbstractNotification<string>>>
+    >
   ): NotificationFramework => {
     if (!this.instance) {
-      this.instance = new NotificationFramework(dbConfig, logger);
+      this.instance = new NotificationFramework(
+        dbConfig,
+        logger,
+        notificationClasses
+      );
       const { notificationRepository, userNotificationMetadataRepository } =
         RepositoryFactory.getRepositoryX(dbConfig);
       this.instance.notificationRepository = notificationRepository;
@@ -79,6 +95,7 @@ export class NotificationFramework implements INotificationFramework {
         viewerId,
         this.notificationRepository,
         this.userNotificationMetadataRepository,
+        this.notificationClasess,
         this.logger
       );
     } catch (error) {
@@ -111,4 +128,10 @@ export class NotificationFramework implements INotificationFramework {
 }
 
 export default NotificationFramework;
-export { Errors, DatabaseType };
+export {
+  Errors,
+  DatabaseType,
+  NotificationServiceBuilder,
+  NotificationService,
+  UserNotificationMetadataService,
+};

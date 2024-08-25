@@ -36,12 +36,14 @@ describe("NotificationService", () => {
       viewerId,
       notificationRepository,
       notificationUserMetdataRepository,
+      [MockNotification],
       new Logger()
     );
     ownersNotificationService = new NotificationService(
       ownerId,
       notificationRepository,
       notificationUserMetdataRepository,
+      [MockNotification],
       new Logger()
     );
 
@@ -60,8 +62,9 @@ describe("NotificationService", () => {
   });
 
   it("shouldn't mark a notification as read when user doesn't have permission", async () => {
+    // Test for sender
     try {
-      await ownersNotificationService.genMarkAsReadX(notif.uid);
+      await sendersNotificationService.genMarkAsReadX(notif.uid);
       const fetchedNotification = await notificationRepository.genFetchX(
         notif.uid
       );
@@ -74,10 +77,10 @@ describe("NotificationService", () => {
   it("should mark a notification as read when user has permission", async () => {
     // Test for owner
     await ownersNotificationService.genMarkAsReadX(notif.uid);
-    const fetchedNotificationOwner = await notificationRepository.genFetchX(
+    const fetchedNotification = await notificationRepository.genFetchX(
       notif.uid
     );
-    expect(fetchedNotificationOwner?.isRead).toBe(true);
+    expect(fetchedNotification?.isRead).toBe(true);
   });
 
   test("sender can't  delete a notification", async () => {
