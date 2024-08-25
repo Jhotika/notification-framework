@@ -24,7 +24,7 @@ export class NotificationService {
     public readonly viewerId: string,
     public readonly notificationRepository: INotificationRepository,
     public readonly userNotificationMetadataRepository: IUserNotificationMetadataRepository,
-    private readonly notificationClasses: Readonly<
+    public readonly notificationClasses: Readonly<
       Array<ConcreteClass<AbstractNotification<string>>>
     >,
     public readonly logger: ILogger = new Logger()
