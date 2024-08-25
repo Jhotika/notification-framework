@@ -13,7 +13,7 @@ import { UserPermissionError } from "../errors/userPermissionError";
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
 
 const notificationFactoryMap: {
-  [key: string]: (json: Object) => INotification;
+  [key: string]: (json: Object) => AbstractNotification;
 } = {
   // NotificationTypes -> NotificationClass.
   // This is a map of all the notification types to their respective classes.
@@ -38,7 +38,9 @@ export class NotificationService {
     );
   }
 
-  factory = (rawNotification: Record<string, any>): INotification | null => {
+  factory = (
+    rawNotification: Record<string, any>
+  ): AbstractNotification | null => {
     const notificationType = rawNotification["type"] as string;
     const factoryMethod = notificationFactoryMap[notificationType];
     if (!factoryMethod) {
@@ -105,10 +107,7 @@ export class NotificationService {
       );
     }
 
-    const notifPerm = await NotificationPerm.fromNotification(
-      this.viewerId,
-      notif
-    );
+    const notifPerm = NotificationPerm.fromNotification(this.viewerId, notif);
     if (!notifPerm.viewerIsOwner) {
       throw new UserPermissionError(
         "User doesn't have permission to mark this notification as read"
@@ -127,18 +126,18 @@ export class NotificationService {
     }
   };
 
-  genFetchNotificationX = async (
+  private genFetchNotificationX = async (
     notificationUid: string
-  ): Promise<INotification | null> => {
+  ): Promise<AbstractNotification | null> => {
     try {
       const maybeNotification__PRIVACY_UNSAFE =
         await this.notificationRepository.genFetchX(notificationUid);
       if (!maybeNotification__PRIVACY_UNSAFE) {
         return null;
       }
-      const perm = await NotificationPerm.fromNotification(
+      const perm = NotificationPerm.fromNotification(
         this.viewerId,
-        maybeNotification__PRIVACY_UNSAFE as INotification
+        maybeNotification__PRIVACY_UNSAFE as AbstractNotification
       );
       if (!perm.canView) {
         throw new UserPermissionError(
@@ -156,6 +155,16 @@ export class NotificationService {
     }
   };
 
+  genFetchNotificationResponseX = async (
+    notificationUid: string
+  ): Promise<INotificationResponse | null> => {
+    const notification = await this.genFetchNotificationX(notificationUid);
+    if (!notification) {
+      return null;
+    }
+    return await notification.genResponse();
+  };
+
   genDeleteNotificationX = async (
     notificationUid: string
   ): Promise<boolean> => {
@@ -163,7 +172,7 @@ export class NotificationService {
     if (!existingNotif) {
       return false;
     }
-    const notifPerm = await NotificationPerm.fromNotification(
+    const notifPerm = NotificationPerm.fromNotification(
       this.viewerId,
       existingNotif as INotification
     );

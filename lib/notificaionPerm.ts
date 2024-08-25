@@ -8,7 +8,7 @@ export class NotificationPerm {
     }
   ) {}
 
-  static fromNotification = async (
+  static fromNotification = (
     viewerUid: string,
     notification: INotification
   ) => {
