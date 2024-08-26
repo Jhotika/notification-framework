@@ -27,12 +27,14 @@ describe("UserNotificationMetadataService", () => {
       viewerId,
       notificationRepository,
       notificationUserMetdataRepository,
+      [MockNotification], // enabled concrete notification classes
       new Logger()
     );
     ownersNotificationService = new NotificationService(
       ownerId,
       notificationRepository,
       notificationUserMetdataRepository,
+      [MockNotification], // enabled concrete notification classes
       new Logger()
     );
     // Mock console.error to prevent error logs from appearing in the console

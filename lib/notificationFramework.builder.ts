@@ -3,10 +3,17 @@ import { DatabaseType, IDatabaseConfig } from "./configs/db/database.config";
 import { IInMemoryConfig } from "./configs/db/inMemory.config";
 import { IMongoCollectionConfig } from "./configs/db/mongoCollection.config";
 import { ILogger, Logger } from "./logger";
+import type {
+  AbstractNotification,
+  ConcreteClass,
+} from "./models/abstractNotification";
 
 export class NotificationFrameworkBuilder {
   private logger: ILogger;
   private dbConfig: IDatabaseConfig;
+  private concreteNotificationClasses: Array<
+    ConcreteClass<AbstractNotification<string>>
+  >;
 
   public withLogger(logger: ILogger): NotificationFrameworkBuilder {
     this.logger = logger;
@@ -33,6 +40,15 @@ export class NotificationFrameworkBuilder {
     return this;
   }
 
+  public withConcreteNotificationClasses(
+    concreteNotificationClasses: Array<
+      ConcreteClass<AbstractNotification<string>>
+    >
+  ): NotificationFrameworkBuilder {
+    this.concreteNotificationClasses = concreteNotificationClasses;
+    return this;
+  }
+
   public buildX = (): NotificationFramework => {
     if (!this.logger) {
       this.logger = new Logger();
@@ -41,6 +57,10 @@ export class NotificationFrameworkBuilder {
       throw new Error("dbConfig is required");
     }
 
-    return NotificationFramework.getInstanceX(this.dbConfig, this.logger);
+    return NotificationFramework.getInstanceX(
+      this.dbConfig,
+      this.logger,
+      this.concreteNotificationClasses
+    );
   };
 }

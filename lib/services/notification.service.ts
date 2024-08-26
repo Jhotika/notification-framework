@@ -1,6 +1,7 @@
-import type { ILogger } from "../logger";
+import { Logger, type ILogger } from "../logger";
 import {
   AbstractNotification,
+  ConcreteClass,
   INotification,
   INotificationResponse,
 } from "../models/abstractNotification";
@@ -8,19 +9,13 @@ import { NotificationPerm } from "../notificaionPerm";
 import { INotificationRepository } from "../repositories/INotificationRepository";
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
-import { MockNotification } from "../__mocks__/MockNotification";
 import { UserPermissionError } from "../errors/userPermissionError";
+import { notificationFactory } from "../models/notificationFactory";
 import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
 
-const notificationFactoryMap: {
+export interface INotificationFactoryMap {
   [key: string]: (json: Object) => AbstractNotification;
-} = {
-  // NotificationTypes -> NotificationClass.
-  // This is a map of all the notification types to their respective classes.
-  // This is used to instantiate the correct class when fetching notifications from the database.
-  // For example, if the type of the notification is "A", the factory method will return an instance of ANotification.
-  MockNotification: (json: Object) => MockNotification.fromJson(json),
-};
+}
 
 export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
@@ -29,7 +24,10 @@ export class NotificationService {
     public readonly viewerId: string,
     public readonly notificationRepository: INotificationRepository,
     public readonly userNotificationMetadataRepository: IUserNotificationMetadataRepository,
-    public readonly logger: ILogger
+    public readonly notificationClasses: Readonly<
+      Array<ConcreteClass<AbstractNotification<string>>>
+    >,
+    public readonly logger: ILogger = new Logger()
   ) {
     this.userNotificationMetadataService = new UserNotificationMetadataService(
       viewerId,
@@ -38,22 +36,7 @@ export class NotificationService {
     );
   }
 
-  factory = (
-    rawNotification: Record<string, any>
-  ): AbstractNotification | null => {
-    const notificationType = rawNotification["type"] as string;
-    const factoryMethod = notificationFactoryMap[notificationType];
-    if (!factoryMethod) {
-      this.logger.error(
-        `No factory method found for notification type ${notificationType}`
-      );
-      return null;
-    } else {
-      return factoryMethod(rawNotification);
-    }
-  };
-
-  private genFetchAllForUserX = async (): Promise<INotification[]> => {
+  private genFetchAllForUserX = async (): Promise<AbstractNotification[]> => {
     const rawNotifications =
       await this.notificationRepository.genFetchAllRawForViewerX(this.viewerId);
     // intentinally running async
@@ -61,10 +44,13 @@ export class NotificationService {
     return (
       await Promise.all(
         rawNotifications.map((rawNotification: Object) =>
-          this.factory(rawNotification as INotification)
+          notificationFactory(
+            rawNotification as AbstractNotification,
+            this.notificationClasses
+          )
         )
       )
-    ).filter((notif) => notif != null) as INotification[];
+    ).filter((notif) => notif != null) as AbstractNotification[];
   };
 
   genFetchAllResponseForUserX = async (): Promise<INotificationResponse[]> => {
@@ -146,7 +132,9 @@ export class NotificationService {
       }
       const maybeNotification =
         maybeNotification__PRIVACY_UNSAFE as INotification;
-      return maybeNotification ? this.factory(maybeNotification) : null;
+      return maybeNotification
+        ? notificationFactory(maybeNotification, this.notificationClasses)
+        : null;
     } catch (error) {
       this.logger.error(
         `Error fetching notification for user ${this.viewerId}: ${error.message}`
