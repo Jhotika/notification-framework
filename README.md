@@ -108,8 +108,9 @@ const builder = new NotificationFrameworkBuilder()
   .withMongoCollectionConfig({
     notificationCollection, // your notification collection
     userNotificationMetadataCollection, // your notification metadata collection
-  });
-  .withLogger(new Logger()) // optional
+  })
+  .withConcreteNotificationClasses([MockNotification]) // list of your concrete notification classes
+  .withLogger(new Logger()); // optional
 
 const framework = builder.buildX();
 
