@@ -88,7 +88,11 @@ const dbConfig = {
 // optional logger
 const logger = new Logger();
 
-const framework = NotificationFramework.getInstanceX(dbConfig, logger);
+const framework = NotificationFramework.getInstanceX(
+  dbConfig,
+  [MockNotification], // list of your concrete notification classes
+  logger // optional
+);
 
 // Use the framework to get services
 const notificationService = framework.getNotificationServiceX("viewerId");

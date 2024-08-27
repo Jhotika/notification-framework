@@ -55,10 +55,10 @@ export class NotificationFramework implements INotificationFramework {
 
   static getInstanceX = (
     dbConfig: IDatabaseConfig,
-    logger: ILogger,
     notificationClasses: Readonly<
       Array<ConcreteClass<AbstractNotification<string>>>
-    >
+    >,
+    logger: ILogger
   ): NotificationFramework => {
     if (!this.instance) {
       this.instance = new NotificationFramework(

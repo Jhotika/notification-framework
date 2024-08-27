@@ -65,8 +65,8 @@ export class NotificationFrameworkBuilder {
 
     return NotificationFramework.getInstanceX(
       this.dbConfig,
-      this.logger,
-      this.concreteNotificationClasses
+      this.concreteNotificationClasses,
+      this.logger
     );
   };
 }
