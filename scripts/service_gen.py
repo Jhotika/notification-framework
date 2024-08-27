@@ -1,16 +1,16 @@
 def create_notification_method(param):
   notification_class = param+"Notification"
   return f"""
-  async genCreate{notification_class} (
+  static async genCreate{notification_class} (
+      payload: Record<string, any>,
       ownerUuid: string,
       senderUuid: string,
-      payload: Record<string, any>,
   ): Promise<void> {{
     try {{
-      const notification = {notification_class}.new(
+      const notification = {notification_class}.New(
+          payload,
           ownerUuid,
           senderUuid,
-          payload,
       )
       await NotificationService.genSave(notification)
     }} catch (e) {{

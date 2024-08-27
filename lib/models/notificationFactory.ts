@@ -3,7 +3,7 @@ import {
   type ConcreteClass,
 } from "./abstractNotification";
 
-export const notificationFactory = <T extends AbstractNotification<string>>(
+export const notificationFactoryX = <T extends AbstractNotification<string>>(
   json: Readonly<Record<string, any>>,
   classes: Readonly<Array<ConcreteClass<T>>>
 ): T => {
@@ -11,10 +11,8 @@ export const notificationFactory = <T extends AbstractNotification<string>>(
   const matchingClass = classes.find((cls) => cls.name === className);
 
   if (!matchingClass) {
-    throw new Error(`Unknown class type: ${className}`);
+    throw new Error(`notificationFactory: class not found for ${className}`);
   }
 
-  const instance = new matchingClass(json);
-
-  return instance;
+  return new matchingClass(json);
 };

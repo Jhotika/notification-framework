@@ -1,21 +1,20 @@
 import {
-  verifyDatabaseConfig,
   DatabaseType,
   IDatabaseConfig,
+  verifyDatabaseConfig,
 } from "./configs/db/database.config";
 import { Errors } from "./errors";
 import { Logger, type ILogger } from "./logger";
-import { INotificationRepository } from "./repositories/INotificationRepository";
-import { IUserNotificationMetadataRepository } from "./repositories/IUserNotificationMetadataRepository";
-import { RepositoryFactory } from "./repositories/repositoryFactory";
-import { NotificationService } from "./services/notification.service";
-import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
-
-import { NotificationServiceBuilder } from "./services/notification.service.builder";
 import {
   AbstractNotification,
   ConcreteClass,
 } from "./models/abstractNotification";
+import type { INotificationRepository } from "./repositories/INotificationRepository";
+import type { IUserNotificationMetadataRepository } from "./repositories/IUserNotificationMetadataRepository";
+import { RepositoryFactory } from "./repositories/repositoryFactory";
+import { NotificationService } from "./services/notification.service";
+import { NotificationServiceBuilder } from "./services/notification.service.builder";
+import { UserNotificationMetadataService } from "./services/userNotificationMetadata.service";
 
 export interface INotificationFramework {
   getNotificationServiceX: (viewerId: string) => NotificationService;
@@ -129,9 +128,9 @@ export class NotificationFramework implements INotificationFramework {
 
 export default NotificationFramework;
 export {
-  Errors,
   DatabaseType,
-  NotificationServiceBuilder,
+  Errors,
   NotificationService,
+  NotificationServiceBuilder,
   UserNotificationMetadataService,
 };

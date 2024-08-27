@@ -56,6 +56,12 @@ export class NotificationFrameworkBuilder {
     if (!this.dbConfig) {
       throw new Error("dbConfig is required");
     }
+    if (
+      !this.concreteNotificationClasses ||
+      this.concreteNotificationClasses.length === 0
+    ) {
+      throw new Error("concreteNotificationClasses is required");
+    }
 
     return NotificationFramework.getInstanceX(
       this.dbConfig,
