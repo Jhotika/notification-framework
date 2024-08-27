@@ -19,13 +19,6 @@ export class MockNotification
 {
   private static readonly __type = "MockNotification";
 
-  public readonly uid: string;
-  public readonly type = MockNotification.__type;
-  public readonly ownerUid: string;
-  public readonly senderUid: string;
-  public readonly isRead: boolean;
-  public readonly createdAt: number;
-  public readonly payload: Record<string, any>;
   public readonly customField: string;
 
   constructor(data: IMockNotification) {
@@ -45,29 +38,6 @@ export class MockNotification
       isRead: false,
       createdAt: Date.now(),
       payload: {},
-      customField,
-    });
-  }
-
-  static fromJson(json: Record<string, any>): MockNotification {
-    const {
-      uid,
-      type,
-      ownerUid,
-      senderUid,
-      isRead,
-      createdAt,
-      payload,
-      customField,
-    } = json;
-    return new MockNotification({
-      uid,
-      type,
-      ownerUid,
-      senderUid,
-      isRead,
-      createdAt,
-      payload,
       customField,
     });
   }
