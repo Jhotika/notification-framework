@@ -1,21 +1,17 @@
 import { Logger, type ILogger } from "../logger";
 import {
   AbstractNotification,
-  ConcreteClass,
-  INotification,
-  INotificationResponse,
+  type ConcreteClass,
+  type INotification,
+  type INotificationResponse,
 } from "../models/abstractNotification";
 import { NotificationPerm } from "../notificaionPerm";
-import { INotificationRepository } from "../repositories/INotificationRepository";
+import type { INotificationRepository } from "../repositories/INotificationRepository";
 import { UserNotificationMetadataService } from "./userNotificationMetadata.service";
 
 import { UserPermissionError } from "../errors/userPermissionError";
-import { notificationFactory } from "../models/notificationFactory";
-import { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
-
-export interface INotificationFactoryMap {
-  [key: string]: (json: Object) => AbstractNotification;
-}
+import { notificationFactoryX } from "../models/notificationFactory";
+import type { IUserNotificationMetadataRepository } from "../repositories/IUserNotificationMetadataRepository";
 
 export class NotificationService {
   private userNotificationMetadataService: UserNotificationMetadataService;
@@ -43,12 +39,21 @@ export class NotificationService {
     await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
     return (
       await Promise.all(
-        rawNotifications.map((rawNotification: Object) =>
-          notificationFactory(
-            rawNotification as AbstractNotification,
-            this.notificationClasses
-          )
-        )
+        rawNotifications
+          .map((rawNotification: Object) => {
+            try {
+              return notificationFactoryX(
+                rawNotification as AbstractNotification,
+                this.notificationClasses
+              );
+            } catch (error) {
+              this.logger.error(
+                `Error creating notification instance: ${error.message}`
+              );
+              return null;
+            }
+          })
+          .filter((notif) => notif != null)
       )
     ).filter((notif) => notif != null) as AbstractNotification[];
   };
@@ -132,9 +137,17 @@ export class NotificationService {
       }
       const maybeNotification =
         maybeNotification__PRIVACY_UNSAFE as INotification;
-      return maybeNotification
-        ? notificationFactory(maybeNotification, this.notificationClasses)
-        : null;
+      try {
+        return notificationFactoryX(
+          maybeNotification,
+          this.notificationClasses
+        );
+      } catch (error) {
+        this.logger.error(
+          `Error creating notification instance: ${error.message}`
+        );
+        return null;
+      }
     } catch (error) {
       this.logger.error(
         `Error fetching notification for user ${this.viewerId}: ${error.message}`

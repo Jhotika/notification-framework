@@ -25,10 +25,6 @@ export abstract class AbstractNotification<T = string>
 
   public abstract genResponse(): Promise<INotificationResponse | null>;
   public abstract toINotification(): INotification<T>;
-
-  static fromJson(_json: Record<string, any>): AbstractNotification {
-    throw new Error("Method not implemented. Implement in subclass.");
-  }
 }
 
 export interface INotificationResponse {
