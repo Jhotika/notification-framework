@@ -38,10 +38,13 @@ export class InMemoryNotificationRepository
   };
 
   genFetchAllRawForViewerX = async (
-    userUid: string
+    userUid: string,
+    genFetchAllRawForViewerX: number | null
   ): Promise<Array<INotification>> => {
     return Array.from(notificationsMap.values()).filter(
-      (notification) => notification.ownerUid === userUid
+      (notification) =>
+        notification.ownerUid === userUid &&
+        notification.createdAt > (genFetchAllRawForViewerX ?? 0)
     );
   };
 

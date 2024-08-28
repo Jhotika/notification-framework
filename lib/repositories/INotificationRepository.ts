@@ -4,7 +4,10 @@ export interface INotificationRepository {
   // genFetchX is a method that fetches a notification for a user as a raw object
   genFetchX(notificationUid: string): Promise<Object | null>;
   // genFetchAllRawForViewerX is a method that fetches all notifications for a user as raw objects
-  genFetchAllRawForViewerX(userId: string): Promise<Array<Object>>;
+  genFetchAllRawForViewerX(
+    userId: string,
+    lastFetchTimeInMs: number | null
+  ): Promise<Array<Object>>;
 
   // genMarkAllAsReadX is a method that marks all notifications as read for a user
   genMarkAllAsReadX(ownerId: string): Promise<void>;

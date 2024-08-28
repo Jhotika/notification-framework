@@ -31,31 +31,31 @@ interface I{notif_name}Response extends INotificationResponse {{
 export class {notif_name} extends AbstractNotification implements I{notif_name} {{
   static notifType = "{param}";
   constructor(
-    uuid: string = v4(),
-    ownerUuid: string,
-    senderUuid: string,
+    uid: string = v4(),
+    ownerUid: string,
+    senderUid: string,
     isRead: boolean = false,
     createdAt: number = Date.now(),
     payload: Record<string, any> = {{}},
   ) {{
-    super(uuid, {notif_name}.notifType, payload, ownerUuid, senderUuid, isRead, createdAt);
+    super(uid, {notif_name}.notifType, payload, ownerUid, senderUid, isRead, createdAt);
   }}
 
   static new(
-    ownerUuid: string,
-    senderUuid: string,
+    ownerUid: string,
+    senderUid: string,
     payload: Record<string, any>,
   ): {notif_name} {{
-    return new {notif_name}( v4(), ownerUuid, senderUuid, false, Date.now(), payload );
+    return new {notif_name}( v4(), ownerUid, senderUid, false, Date.now(), payload );
   }}
 
   genResponse = async (): Promise<I{notif_name}Response> => {{
     return {{
       notification: {{
-        uuid: this.uuid,
+        uid: this.uid,
         type: this.type,
         payload: this.payload,
-        ownerUuid: this.ownerUuid,
+        ownerUid: this.ownerUid,
         isRead: this.isRead,
         createdAt: this.createdAt,
       }} as INotification,

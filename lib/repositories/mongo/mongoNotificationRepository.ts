@@ -53,11 +53,13 @@ export class MongoNotificationRepository
   };
 
   genFetchAllRawForViewerX = async (
-    viewerUid: string
+    viewerUid: string,
+    lastFetchTimeInMs: number | null
   ): Promise<Array<Object>> => {
     return await this.collection
       .find({
         ownerUid: viewerUid,
+        createdAt: { $gt: lastFetchTimeInMs ?? 0 },
       })
       .toArray();
   };

@@ -32,9 +32,14 @@ export class NotificationService {
     );
   }
 
-  private genFetchAllForUserX = async (): Promise<AbstractNotification[]> => {
+  private genFetchAllForUserX = async (
+    lastFetchTimeInMs: number
+  ): Promise<AbstractNotification[]> => {
     const rawNotifications =
-      await this.notificationRepository.genFetchAllRawForViewerX(this.viewerId);
+      await this.notificationRepository.genFetchAllRawForViewerX(
+        this.viewerId,
+        lastFetchTimeInMs
+      );
     // intentinally running async
     await this.userNotificationMetadataService.genUpdateWatermarkForUserX();
     return (
@@ -58,8 +63,10 @@ export class NotificationService {
     ).filter((notif) => notif != null) as AbstractNotification[];
   };
 
-  genFetchAllResponseForUserX = async (): Promise<INotificationResponse[]> => {
-    const notifications = await this.genFetchAllForUserX();
+  genFetchAllResponseForUserX = async (
+    lastFetchTimeInMs: number
+  ): Promise<INotificationResponse[]> => {
+    const notifications = await this.genFetchAllForUserX(lastFetchTimeInMs);
     return (
       await Promise.all(
         notifications.map((notification: AbstractNotification) =>

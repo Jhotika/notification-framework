@@ -3,19 +3,19 @@ def create_notification_method(param):
   return f"""
   static async genCreate{notification_class} (
       payload: Record<string, any>,
-      ownerUuid: string,
-      senderUuid: string,
+      ownerUid: string,
+      senderUid: string,
   ): Promise<void> {{
     try {{
       const notification = {notification_class}.New(
           payload,
-          ownerUuid,
-          senderUuid,
+          ownerUid,
+          senderUid,
       )
       await NotificationService.genSave(notification)
     }} catch (e) {{
       new Logger().error(
-          "Failed to create {param} notification for user {{ownerUuid}}: " + e.message?.toString()
+          "Failed to create {param} notification for user {{ownerUid}}: " + e.message?.toString()
       )
     }}
   }}
