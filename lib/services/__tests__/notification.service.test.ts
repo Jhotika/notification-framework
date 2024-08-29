@@ -132,7 +132,7 @@ describe("NotificationService", () => {
     ]);
 
     const notifications =
-      await ownersNotificationService.genFetchAllResponseForUserX();
+      await ownersNotificationService.genFetchAllResponseForUserX(null);
 
     expect(notifications.length).toBe(2);
 

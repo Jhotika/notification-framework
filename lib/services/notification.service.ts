@@ -33,7 +33,7 @@ export class NotificationService {
   }
 
   private genFetchAllForUserX = async (
-    lastFetchTimeInMs: number
+    lastFetchTimeInMs: number | null
   ): Promise<AbstractNotification[]> => {
     const rawNotifications =
       await this.notificationRepository.genFetchAllRawForViewerX(
@@ -64,7 +64,7 @@ export class NotificationService {
   };
 
   genFetchAllResponseForUserX = async (
-    lastFetchTimeInMs: number
+    lastFetchTimeInMs: number | null
   ): Promise<INotificationResponse[]> => {
     const notifications = await this.genFetchAllForUserX(lastFetchTimeInMs);
     return (
