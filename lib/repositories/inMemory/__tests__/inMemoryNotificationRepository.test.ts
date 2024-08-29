@@ -55,7 +55,8 @@ describe("InMemoryNotificationRepository", () => {
     await anotherNotificationRepository.genCreateX(notificationAnotherUser);
     await notificationRepository.genCreateX(notification2);
     const notifications = await notificationRepository.genFetchAllRawForViewerX(
-      viewerId
+      viewerId,
+      null
     );
     expect(notifications).toEqual([notification, notification2]);
   });
@@ -65,7 +66,8 @@ describe("InMemoryNotificationRepository", () => {
     await notificationRepository.genCreateX(notification3);
     await notificationRepository.genMarkAllAsReadX();
     const allNotifs = await notificationRepository.genFetchAllRawForViewerX(
-      viewerId
+      viewerId,
+      null
     );
     expect(allNotifs.every((n) => n.isRead)).toBe(true);
   });

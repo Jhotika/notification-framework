@@ -59,7 +59,7 @@ describe("UserNotificationMetadataService", () => {
 
   it("should fetch all notifications for user", async () => {
     const notifications =
-      await ownersNotificationService.genFetchAllResponseForUserX();
+      await ownersNotificationService.genFetchAllResponseForUserX(null);
     expect(notifications).toEqual([]);
   });
 
